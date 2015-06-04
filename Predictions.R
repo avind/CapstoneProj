@@ -1,9 +1,22 @@
 fil.data <- readRDS("fil.data.rds")
-fil.data <- readRDS("central.rds")
-fil.data <- readRDS("eastern.rds")
-fil.data <- readRDS("noreast.rds")
-fil.data <- readRDS("norwest.rds")
-fil.data <- readRDS("west.rds")
+central <- readRDS("central.rds")
+eastern <- readRDS("eastern.rds")
+noreast <- readRDS("noreast.rds")
+norwest <- readRDS("norwest.rds")
+west <- readRDS("west.rds")
+
+#select for the four highway types in the dataset
+king <- filter(fil.data, hwy.type == "King")
+secon <- filter(fil.data, hwy.type == "Sec")
+fwy <- filter(fil.data, hwy.type == "Fwy")
+tert <- filter(fil.data, hwy.type == "Tert")
+
+#grouping data by regions: Central, Eastern, Northeastern, Northwestern, West
+central <- filter(fil.data, reg == "CR")
+eastern <- filter(fil.data, reg == "ER")
+noreast <- filter(fil.data, reg == "NE")
+norwest <- filter(fil.data, reg == "NW")
+west <- filter(fil.data, reg == "SW")
 
 ##4: Predictions
 
@@ -19,8 +32,6 @@ lmfit1 <- lm (aadt ~ travel.pattern, data=fwy)
 summary(lmfit1)
 plot(lmfit1)
 anova(lmfit1)
-
-covfit(lmfit1)
 
 #for possible later extraction:
 #fitted(lmmodel1)
