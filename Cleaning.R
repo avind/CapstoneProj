@@ -5,8 +5,7 @@ raw2 <- raw[-1:-2,] #remove extraneous rows (French and blank row) to allow "rea
 raw3 <- type_convert(raw2)
 str(raw3) #check datatypes
 
-
-##1: Initial Cleaning
+#1: Initial Cleaning
 library(magrittr)
 library(dplyr)
 
@@ -52,7 +51,6 @@ nrow(eastern)
 nrow(noreast)
 nrow(norwest)
 nrow(west)
-
 
 ##There are `r sum(renamed.raw$year=="9999")` incomplete entries. These entries are set to Year "9999" and have no values for AADT and the related variables.
 
