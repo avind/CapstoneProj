@@ -29,6 +29,9 @@ fil.data <- renamed.raw %>%
   distinct() %>%
   filter(year!="9999")
 
+fil.data2 <- filter(fil.data, travel.pattern != "UKN")
+fil.data <- filter(fil.data, travel.pattern != "UNC")
+
 length(fil.data$year)
 length(fil.data$aadt)
 
