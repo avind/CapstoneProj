@@ -74,18 +74,12 @@ corrplot(cor(dhvcor))
 plot(cordata)
 
 
-model_ulm <- lm (aadt ~ travel.pattern, data=fil.data)
-summary(model_ulm)
-plot(model_ulm)
-
 fil.data2 <- fil.data
 
 fil.data2 <- within(fil.data2, {
   travel.patternC <- C(travel.pattern, aadt)
   print(attributes(travel.patternC))
 })
-
-
 
 fwy %>% 
   ggvis(~travel.pattern, ~aadt) %>%
