@@ -13,61 +13,7 @@ describe(fil.data)
 #cor(renamed.raw)
 
 
-#MTO divides the highways into four categories: the king's highways, the secondary highways, the tertiary roads, and selected 7000 series highways. the king's highways will be further grouped into the 400 series highways +  the QEW.
-
-library(dplyr)
-
-#select for the four highway types in the dataset
-king <- filter(fil.data, hwy.type == "King")
-secon <- filter(fil.data, hwy.type == "Sec")
-fwy <- filter(fil.data, hwy.type == "Fwy")
-tert <- filter(fil.data, hwy.type == "Tert")
-
-#select for the 400, 401, 402, 403, 404, 405, 406, 407, 409, 410, 416, 417, 420, 427
-target <- c("400", "401", "402", "403", "404", "405", "406", "407", "409", "410", "416", "417", "420", "427")
-four <- filter(fil.data, hwy.num %in% target)
-
-#select for the remaining non-400 series freeways (the QEW) 
-qew <- filter(fwy, !(hwy.num %in% target))
-
-
-
-summary(lm(sadt~aadt, data=fil.data))
-plot(fil.data$sadt~fil.data$aadt, xlab="SADT", ylab="AADT", main="Plot of SADT and AADT")
-
-
-
-fil.data %>%
-  group_by(hwy.type) %>%
-  ggvis (~year, ~aadt, stroke = ~factor(hwy.type)) %>%
-  layer_smooths() %>%
-  title= "Year ~ AADT"
-
-
-##Distribution of AADT, SADT, SAWDT, and WADT
-
-datadis <- select(fil.data, aadt, sadt, sawdt, wadt)
-boxplot(datadis,
-        main="Distribution of Data",
-        ylab="Value",
-        xlab="Data Type")
-
-
-##Histograms of Highway Type
-
-fil.data %>%
-  group_by(hwy.type) %>%
-  ggvis (~year, ~aadt, fill=~hwy.type) %>%
-  layer_histograms() 
-
-
-fil.data %>%
-  group_by(hwy.type) %>%
-  ggvis(~year, ~aadt, fill = ~hwy.type) %>%
-  layer_densities()
-
-
-#From R Cookbook: http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/
+#From R Cookbook: http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot1)/
 
 # Multiple plot function
 #
@@ -124,7 +70,7 @@ ggvis(central, ~aadt, fill:= "#fff8dc") %>%
   layer_histograms() %>%
   add_axis("x", title = "AADT") %>%
   add_axis("y", title = "Count") 
-  
+
 library(ggplot2)
 
 p1 <- qplot(central$aadt,
@@ -161,3 +107,59 @@ multiplot(p1, p2, p3, p4, p5, p6, cols=3)
 
 
 ##look for areas that have large seasonal variations 
+
+
+#MTO divides the highways into four categories: the king's highways, the secondary highways, the tertiary roads, and selected 7000 series highways. the king's highways will be further grouped into the 400 series highways +  the QEW.
+
+library(dplyr)
+
+#select for the four highway types in the dataset
+king <- filter(fil.data, hwy.type == "King")
+secon <- filter(fil.data, hwy.type == "Sec")
+fwy <- filter(fil.data, hwy.type == "Fwy")
+tert <- filter(fil.data, hwy.type == "Tert")
+
+#select for the 400, 401, 402, 403, 404, 405, 406, 407, 409, 410, 416, 417, 420, 427
+target <- c("400", "401", "402", "403", "404", "405", "406", "407", "409", "410", "416", "417", "420", "427")
+four <- filter(fil.data, hwy.num %in% target)
+
+#select for the remaining non-400 series freeways (the QEW) 
+qew <- filter(fwy, !(hwy.num %in% target))
+
+
+
+summary(lm(sadt~aadt, data=fil.data))
+plot(fil.data$sadt~fil.data$aadt, xlab="SADT", ylab="AADT", main="Plot of SADT and AADT")
+
+
+
+fil.data %>%
+  group_by(hwy.type) %>%
+  ggvis (~year, ~aadt, stroke = ~factor(hwy.type)) %>%
+  layer_smooths() %>%
+  title= "Year ~ AADT"
+
+
+##Distribution of AADT, SADT, SAWDT, and WADT
+
+datadis <- select(fil.data, aadt, sadt, sawdt, wadt)
+boxplot(datadis,
+        main="Distribution of Data",
+        ylab="Value",
+        xlab="Data Type")
+
+
+##Histograms of Highway Type
+
+fil.data %>%
+  group_by(hwy.type) %>%
+  ggvis (~year, ~aadt, fill=~hwy.type) %>%
+  layer_histograms() 
+
+
+fil.data %>%
+  group_by(hwy.type) %>%
+  ggvis(~year, ~aadt, fill = ~hwy.type) %>%
+  layer_densities()
+
+
