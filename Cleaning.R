@@ -46,12 +46,12 @@ noreast <- filter(fil.data, reg == "NE")
 norwest <- filter(fil.data, reg == "NW")
 west <- filter(fil.data, reg == "SW")
 
-nrow(central)
-nrow(eastern)
-nrow(noreast)
-nrow(norwest)
-nrow(west)
-
+dim(central)
+dim(eastern)
+dim(noreast)
+dim(norwest)
+dim(west)
+ 
 ##There are `r sum(renamed.raw$year=="9999")` incomplete entries. These entries are set to Year "9999" and have no values for AADT and the related variables.
 
 ##There are `r length(fil.data$aadt)` remaining observations
