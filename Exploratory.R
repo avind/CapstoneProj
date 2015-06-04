@@ -61,7 +61,6 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   }
 }
 
-
 #describe distribution of patterns by region
 #central
 library(ggvis)
