@@ -1,3 +1,10 @@
+fil.data <- readRDS("fil.data.rds")
+fil.data <- readRDS("central.rds")
+fil.data <- readRDS("eastern.rds")
+fil.data <- readRDS("noreast.rds")
+fil.data <- readRDS("norwest.rds")
+fil.data <- readRDS("west.rds")
+
 ##4: Predictions
 
 

@@ -57,3 +57,8 @@ dim(west)
 ##There are `r length(fil.data$aadt)` remaining observations
 
 saveRDS(fil.data, "fil.data.rds")
+saveRDS(central, "central.rds")
+saveRDS(eastern, "eastern.rds")
+saveRDS(noreast, "noreast.rds")
+saveRDS(norwest, "norwest.rds")
+saveRDS(west, "west.rds")
