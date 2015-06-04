@@ -148,32 +148,4 @@ paste("PRED(25):", pred25)
 
 
 
-library(dplyr)
-library(corrplot)
-
-cordata <- fil.data %>%
-  group_by(reg) %>%
-  select(year, aadt)
-
-dhvcor <- select(fil.data, dhv.percent, aadt, sadt, sawdt, wadt)
-cor(cordata)
-cor(dhvcor)
-corrplot(cor(cordata))
-corrplot(cor(dhvcor))
-plot(cordata)
-
-
-fil.data2 <- fil.data
-
-fil.data2 <- within(fil.data2, {
-  travel.patternC <- C(travel.pattern, aadt)
-  print(attributes(travel.patternC))
-})
-
-fwy %>% 
-  ggvis(~travel.pattern, ~aadt) %>%
-  layer_histograms() %>%
-  layer_model_predictions()
-
-ggplot(model_ulm)
 
