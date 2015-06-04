@@ -11,7 +11,10 @@ fil.data <- readRDS("west.rds")
 library(dplyr)
 library(corrplot)
 
-cordata <- select(fil.data, aadt, sadt, sawdt, wadt)
+cordata <- fil.data %>%
+  group_by(reg) %>%
+  select(year, aadt)
+
 dhvcor <- select(fil.data, dhv.percent, aadt, sadt, sawdt, wadt)
 cor(cordata)
 cor(dhvcor)
@@ -31,11 +34,38 @@ fil.data2 <- within(fil.data2, {
   print(attributes(travel.patternC))
 })
 
+#Linear Models for each Region 
 
+par(mfrow=c(2,2))
 
-model_ulm <- lm (aadt ~ travel.pattern, data=fwy)
-summary(model_ulm)
-plot(model_ulm)
+lmmodel1 <- lm (aadt ~ travel.pattern, data=fwy)
+summary(lmmodel1)
+plot(lmmodel1)
+anova(lmmodel1)
+
+covfit(lmmodel1)
+
+#for possible later extraction:
+  #fitted(lmmodel1)
+  #coef(lmmodel1)
+  #residuals(lmmodel1)
+  #names(lmmodel1)
+
+lmmodel2 <- lm (aadt ~ travel.pattern, data=fwy)
+summary(lmmodel2)
+plot(lmmodel2)
+
+lmmodel3<- lm (aadt ~ travel.pattern, data=fwy)
+summary(lmmodel3)
+plot(lmmodel3)
+
+lmmodel4<- lm (aadt ~ travel.pattern, data=fwy)
+summary(lmmodel4)
+plot(lmmodel4)
+
+lmmodel5<- lm (aadt ~ travel.pattern, data=fwy)
+summary(lmmodel5)
+plot(lmmodel5)
 
 fwy %>% 
   ggvis(~travel.pattern, ~aadt) %>%
@@ -43,7 +73,6 @@ fwy %>%
   layer_model_predictions()
 
 ggplot(model_ulm)
-```
 
 
 #<!-- rank data 
