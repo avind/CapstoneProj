@@ -74,19 +74,3 @@ fwy %>%
 
 ggplot(model_ulm)
 
-
-#<!-- rank data 
-
-#{r, include=FALSE}
-# add this chunk to end of mycode.rmd
-#file.rename(from="scripts/mycode.md", 
-            to="README.md")
-
-
-##GIS Mapping with ORN
-
-
-#> orndbf <- read.dbf("C:/Users/Alex/ORN_SEGMENT_WITH_ADDRESS.dbf")
-#> str(orndbf)
-
-
