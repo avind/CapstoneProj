@@ -123,9 +123,9 @@ par(mfrow=c(3,2))
 ggvis(central, ~aadt, fill:= "#fff8dc") %>%
   layer_histograms() %>%
   add_axis("x", title = "AADT") %>%
-  add_axis("y", title = "Count") %>%
+  add_axis("y", title = "Count") 
   
-  library(ggplot2)
+library(ggplot2)
 
 p1 <- qplot(central$aadt,
             geom="histogram",
