@@ -81,6 +81,7 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 
 #describe distribution of patterns by region
 #central
+
 library(ggvis)
 par(mfrow=c(3,2))
 ggvis(central, ~aadt, fill:= "#fff8dc") %>%
