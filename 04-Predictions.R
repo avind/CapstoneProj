@@ -92,6 +92,28 @@ paste("PRED(25):", pred25)
 
 #Stepwise Regression
 
+#Forward stepwise regression:
+
+numeric.travel <- fil.data
+numeric.travel$travel.pattern <- as.numeric(numeric.travel$travel.pattern)
+
+library(MASS) 
+library(leaps) 
+full <- lm(aadt~travel.pattern, data=fwy) 
+null <- lm(aadt~1,data=fwy)
+stepF <- stepAIC(null, scope=list(lower=null, upper=full), 
+                 direction= "forward", trace=TRUE)
+
+summary(stepF)
+
+
+#Backward stepwise regression:
+
+full <- lm(aadt~travel.pattern, data=fwy) 
+stepB <- stepAIC(full, direction= "backward", trace=TRUE)
+
+summary(stepB)
+
 
 #10 Fold Cross Validation
 library(caret)
