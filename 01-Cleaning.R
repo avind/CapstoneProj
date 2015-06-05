@@ -1,16 +1,19 @@
-##Import 
 library(readr)
+library(dplyr)
+
+##Import 
+
+#lib - readr
 raw <- read_csv("1371_traffic_volumes.csv")
 raw2 <- raw[-1:-2,] #remove extraneous rows (French and blank row) to allow "readr" to reparse variables types correctly
 raw3 <- type_convert(raw2)
 str(raw3) #check datatypes
 
 #1: Initial Cleaning
-library(magrittr)
-library(dplyr)
+
 
 #rename columns
-library(dplyr)
+#lib - dplyr
 renamed.raw <- rename(raw3, "lhrs" = LHRS,"OS" =`O/S`, "year" = Year, "hwy.num" = `Hwy #`, "hwy.let" = `Hwy Let`, "hwy.type" = `Hwy Type (Text)`, "location" = `Location Description`, "reg" = Reg, "section.len" = `Section Length`, "conn.link.len" = `Connecting Link Length`, "sec.description" = `Secondary Description (for Connecting Links, Regional Boundarys,etc)`, "travel.pattern" = `Travel Pattern`, "dhv.percent" = `DHV %`, "directional.split" = `Directional Split`, "aadt" = AADT, "annual.aadt.change" = `Yearly % Change in AADT`, "decade.change" = `10 Year % Change in AADT`, "sadt" = SADT, "sawdt" = SAWDT, "wadt" = WADT)
 
 #checking for NAs
