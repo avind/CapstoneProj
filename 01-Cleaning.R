@@ -27,13 +27,11 @@ sum(renamed.raw$year=="9999")
 #removing NAs and duplicate entries
 fil.data <- renamed.raw %>%
   distinct() %>%
-  filter(year!="9999")
-
-fil.data2 <- filter(fil.data, travel.pattern != "UKN")
-fil.data <- filter(fil.data, travel.pattern != "UNC")
+  filter(year!="9999", travel.pattern!="UNC", travel.pattern!="UKN")
 
 length(fil.data$year)
 length(fil.data$aadt)
+length(fil.data$travel.pattern)
 
 glimpse(fil.data)
 
