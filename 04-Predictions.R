@@ -23,8 +23,7 @@ west <- filter(fil.data, reg == "SW")
 
 ------------------
 ------------------
-  
-  
+
 #Linear Models for each Region 
   
 par(mfrow=c(2,2))
@@ -34,32 +33,32 @@ summary(lmfit0)
 plot(lmfit0)
 anova(lmfit0)
 
-lmfit1 <- lm (aadt ~ travel.pattern, data=fwy)
+lmfit1 <- lm (aadt ~ travel.pattern, data=central)
 summary(lmfit1)
 plot(lmfit1)
 anova(lmfit1)
+
+lmfit2 <- lm (aadt ~ travel.pattern, data=eastern)
+summary(lmfit2)
+plot(lmfit2)
+
+lmfit3<- lm (aadt ~ travel.pattern, data=noreast)
+summary(lmfit3)
+plot(lmfit3)
+
+lmfit4<- lm (aadt ~ travel.pattern, data=norwest)
+summary(lmfit4)
+plot(lmfit4)
+
+lmfit5<- lm (aadt ~ travel.pattern, data=west)
+summary(lmfit5)
+plot(lmfit5)
 
 #for possible later extraction:
 #fitted(lmmodel1)
 #coef(lmmodel1)
 #residuals(lmmodel1)
 #names(lmmodel1)
-
-lmfit2 <- lm (aadt ~ travel.pattern, data=fwy)
-summary(lmfit2)
-plot(lmfit2)
-
-lmfit3<- lm (aadt ~ travel.pattern, data=fwy)
-summary(lmfit3)
-plot(lmfit3)
-
-lmfit4<- lm (aadt ~ travel.pattern, data=fwy)
-summary(lmfit4)
-plot(lmfit4)
-
-lmfit5<- lm (aadt ~ travel.pattern, data=fwy)
-summary(lmfit5)
-plot(lmfit5)
 
 ------------------
 ------------------
@@ -136,6 +135,54 @@ rel_change <- 1 - ((test$aadt- abs(Errors)) / test$aadt)
 pred25 <- table(rel_change<0.25)["TRUE"] / nrow(test)
 paste("RMSE:", rmse)
 paste("PRED(25):", pred25)
+
+#Best Combination of Travel Patterns
+
+library(leaps)
+subsets<-regsubsets(aadt~travel.pattern,data=fil.data,
+                    nbest=1,)
+sub.sum <- summary(subsets)
+summary(subsets)
+as.data.frame(sub.sum$outmat)
+
+#Best Combination of Regions
+
+#All Data
+library(leaps)
+subsets<-regsubsets(aadt~travel.pattern,data=fil.data,
+                    nbest=1,)
+sub.sum <- summary(subsets)
+as.data.frame(sub.sum$outmat)
+
+#Central Region
+subsets<-regsubsets(aadt~travel.pattern,data=central,
+                    nbest=1,)
+sub.sum <- summary(subsets)
+as.data.frame(sub.sum$outmat)
+
+#Eastern Region
+subsets<-regsubsets(aadt~travel.pattern,data=eastern,
+                    nbest=1,)
+sub.sum <- summary(subsets)
+as.data.frame(sub.sum$outmat)
+
+#Northeast
+subsets<-regsubsets(aadt~travel.pattern,data=noreast,
+                    nbest=1,)
+sub.sum <- summary(subsets)
+as.data.frame(sub.sum$outmat)
+
+#Northwest
+subsets<-regsubsets(aadt~travel.pattern,data=norwest,
+                    nbest=1,)
+sub.sum <- summary(subsets)
+as.data.frame(sub.sum$outmat)
+
+#Western
+subsets<-regsubsets(aadt~travel.pattern,data=west,
+                    nbest=1,)
+sub.sum <- summary(subsets)
+as.data.frame(sub.sum$outmat)
 
 ------------------
 ------------------
