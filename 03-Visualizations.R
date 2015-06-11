@@ -82,9 +82,11 @@ map <- ggplot2::fortify(regions, region="NAME")
 map %>%
   group_by(group, id) %>%
   ggvis(~long, ~lat) %>%
-  layer_paths(strokeOpacity := .15) %>%
+  layer_paths(strokeOpacity := .30) %>%
   hide_legend("fill") %>%
   hide_axis("x") %>% hide_axis("y") %>%
-  set_options(width=600, height=600, keep_aspect=TRUE)
+  set_options(width=700, height=600, keep_aspect=TRUE)
+
+
 
 
