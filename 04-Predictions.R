@@ -21,6 +21,21 @@ west <- filter(fil.data, reg == "SW")
 
 ##4: Predictions
 
+#Correlations
+
+library(corrplot)
+library(Hmisc)
+library(dplyr)
+cor.data <- select(fil.data, year, hwy.num, reg, travel.pattern, aadt, sadt, sawdt, wadt)
+
+numeric_column <- sapply(cor.data, is.numeric)
+cor(cor.data[, numeric_column], method="spearman")
+corrplot(cor(cor.data[, numeric_column]), method="ellipse")
+
+library(psych)
+icc.data <- select(fil.data, travel.pattern, aadt)
+ICC(icc.data)
+
 ------------------
 ------------------
 
@@ -102,15 +117,12 @@ full <- lm(aadt~travel.pattern, data=fwy)
 null <- lm(aadt~1,data=fwy)
 stepF <- stepAIC(null, scope=list(lower=null, upper=full), 
                  direction= "forward", trace=TRUE)
-
 summary(stepF)
-
 
 #Backward stepwise regression:
 
 full <- lm(aadt~travel.pattern, data=fwy) 
 stepB <- stepAIC(full, direction= "backward", trace=TRUE)
-
 summary(stepB)
 
 
@@ -136,18 +148,9 @@ pred25 <- table(rel_change<0.25)["TRUE"] / nrow(test)
 paste("RMSE:", rmse)
 paste("PRED(25):", pred25)
 
-#Best Combination of Travel Patterns
+#Best Combination of Travel Patterns by Regions
 
-library(leaps)
-subsets<-regsubsets(aadt~travel.pattern,data=fil.data,
-                    nbest=1,)
-sub.sum <- summary(subsets)
-summary(subsets)
-as.data.frame(sub.sum$outmat)
-
-#Best Combination of Regions
-
-#All Data
+#All Regions
 library(leaps)
 subsets<-regsubsets(aadt~travel.pattern,data=fil.data,
                     nbest=1,)
