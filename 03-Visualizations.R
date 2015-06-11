@@ -61,5 +61,5 @@ library(mapproj)
 map <- get_map(location = 'Ontario Canada', zoom = 5)
 ggmap(map)
 
-
+---
 
