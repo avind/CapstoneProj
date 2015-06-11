@@ -63,3 +63,28 @@ ggmap(map)
 
 ---
 
+#Interactive Map and Choropleth  
+  
+library(ggvis)
+library(rgdal)
+library(rgeos)
+library(magrittr)
+library(dplyr)
+library(RColorBrewer)
+library(data.table)
+library(maptools)  
+  
+regions <- readOGR("MTO_Regions", 
+                   layer="MTO_Regions")
+
+map <- ggplot2::fortify(regions, region="NAME")
+
+map %>%
+  group_by(group, id) %>%
+  ggvis(~long, ~lat) %>%
+  layer_paths(strokeOpacity := .15) %>%
+  hide_legend("fill") %>%
+  hide_axis("x") %>% hide_axis("y") %>%
+  set_options(width=600, height=600, keep_aspect=TRUE)
+
+
