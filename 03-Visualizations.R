@@ -54,12 +54,5 @@ fwy %>%
 fwyhist <- select(fwy, travel.pattern, aadt)
 hist(fwyhist$aadt)
 
-#Mapping
-
-library(ggmap)
-library(mapproj)
-map <- get_map(location = 'Ontario Canada', zoom = 5)
-ggmap(map)
-
 
 
