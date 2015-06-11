@@ -41,12 +41,34 @@ ICC(icc.data)
 
 #Linear Models for each Region 
   
-par(mfrow=c(2,2))
+#par(mfrow=c(2,2))
 
+#Fit for All Regions
+    
 lmfit0 <- lm (aadt ~ travel.pattern, data=fil.data)
 summary(lmfit0)
 plot(lmfit0)
 anova(lmfit0)
+
+rsq0 <- summary(lmfit0)$r.squared
+rsq0
+sqrt(rsq0)
+
+print(lmfit$fitted)
+
+cor(fil.data$aadt, lmfit0$fitted)
+
+plot(x = lmfit0$fitted, y = fil.data$aadt,
+     xlab = "Fitted AADT", ylab = "Observed AADT")
+abline(lm(fil.data$aadt ~ lmfit0$fitted,), col="red")
+
+
+library(heplots) # for eta
+model.aov <- aov(aadt ~ travel.pattern, data = fil.data)
+summary(model.aov)
+
+
+#Fit for Each Region
 
 lmfit1 <- lm (aadt ~ travel.pattern, data=central)
 summary(lmfit1)
