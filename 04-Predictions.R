@@ -21,8 +21,6 @@ west <- filter(fil.data, reg == "SW")
 
 ##4: Predictions
 
-
-
 ------------------
 ------------------
 
@@ -30,9 +28,9 @@ west <- filter(fil.data, reg == "SW")
   
 #par(mfrow=c(2,2))
 
-#Fit for All Regions
+##Fit for All Regions
 
-#Strength of Association  
+###Strength of Association  
 
 boxplot(aadt ~ travel.pattern, data = fil.data, ylab = "AADT for All Regions")  
         
@@ -53,13 +51,12 @@ plot(x = lmfit0$fitted, y = fil.data$aadt,
      xlab = "Fitted AADT", ylab = "Observed AADT")
 abline(lm(fil.data$aadt ~ lmfit0$fitted,), col="red")
 
-
+###One-way ANOVA
 library(heplots) # for eta
 model.aov <- aov(aadt ~ travel.pattern, data = fil.data)
 summary(model.aov)
 
-
-#Fit for Each Region
+###Fit for Each Region
 
 lmfit1 <- lm (aadt ~ travel.pattern, data=central)
 summary(lmfit1)
@@ -126,15 +123,15 @@ numeric.travel$travel.pattern <- as.numeric(numeric.travel$travel.pattern)
 
 library(MASS) 
 library(leaps) 
-full <- lm(aadt~travel.pattern, data=fwy) 
-null <- lm(aadt~1,data=fwy)
+full <- lm(aadt~travel.pattern, data=fil.data) 
+null <- lm(aadt~1,data=fil.data)
 stepF <- stepAIC(null, scope=list(lower=null, upper=full), 
                  direction= "forward", trace=TRUE)
 summary(stepF)
 
 #Backward stepwise regression:
 
-full <- lm(aadt~travel.pattern, data=fwy) 
+full <- lm(aadt~travel.pattern, data=fil.data) 
 stepB <- stepAIC(full, direction= "backward", trace=TRUE)
 summary(stepB)
 
@@ -161,44 +158,57 @@ pred25 <- table(rel_change<0.25)["TRUE"] / nrow(test)
 paste("RMSE:", rmse)
 paste("PRED(25):", pred25)
 
-#Best Combination of Travel Patterns by Regions
+#Best Combination of Travel Patterns for All Regions
 
-#All Regions
 library(leaps)
 subsets<-regsubsets(aadt~travel.pattern,data=fil.data,
                     nbest=1,)
 sub.sum <- summary(subsets)
 as.data.frame(sub.sum$outmat)
 
+------------------
+------------------
 #Central Region
 subsets<-regsubsets(aadt~travel.pattern,data=central,
-                    nbest=1,)
+                      nbest=1,)
 sub.sum <- summary(subsets)
 as.data.frame(sub.sum$outmat)
-
+------------------
+------------------  
 #Eastern Region
 subsets<-regsubsets(aadt~travel.pattern,data=eastern,
                     nbest=1,)
 sub.sum <- summary(subsets)
 as.data.frame(sub.sum$outmat)
-
+------------------
+------------------
 #Northeast
 subsets<-regsubsets(aadt~travel.pattern,data=noreast,
                     nbest=1,)
 sub.sum <- summary(subsets)
 as.data.frame(sub.sum$outmat)
-
+------------------
+------------------
 #Northwest
 subsets<-regsubsets(aadt~travel.pattern,data=norwest,
                     nbest=1,)
 sub.sum <- summary(subsets)
-as.data.frame(sub.sum$outmat)
-
+as.data.frame(sub.sum$outmat) 
+------------------
+------------------
 #Western
 subsets<-regsubsets(aadt~travel.pattern,data=west,
                     nbest=1,)
 sub.sum <- summary(subsets)
 as.data.frame(sub.sum$outmat)
+
+------------------
+------------------  
+    
+
+
+
+
 
 ------------------
 ------------------
