@@ -21,20 +21,7 @@ west <- filter(fil.data, reg == "SW")
 
 ##4: Predictions
 
-#Correlations
 
-library(corrplot)
-library(Hmisc)
-library(dplyr)
-cor.data <- select(fil.data, year, hwy.num, reg, travel.pattern, aadt, sadt, sawdt, wadt)
-
-numeric_column <- sapply(cor.data, is.numeric)
-cor(cor.data[, numeric_column], method="spearman")
-corrplot(cor(cor.data[, numeric_column]), method="ellipse")
-
-library(psych)
-icc.data <- select(fil.data, travel.pattern, aadt)
-ICC(icc.data)
 
 ------------------
 ------------------
@@ -44,7 +31,11 @@ ICC(icc.data)
 #par(mfrow=c(2,2))
 
 #Fit for All Regions
-    
+
+#Strength of Association  
+
+boxplot(aadt ~ travel.pattern, data = fil.data, ylab = "AADT for All Regions")  
+        
 lmfit0 <- lm (aadt ~ travel.pattern, data=fil.data)
 summary(lmfit0)
 plot(lmfit0)
