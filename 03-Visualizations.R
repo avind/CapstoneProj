@@ -94,7 +94,8 @@ plot(fit, mass = TRUE, contrib = "absolute", map =
        "rowgreen", arrows = c(FALSE, TRUE)) # asymmetric map  
   
 ---
-
+---
+  
 #Interactive Map and Choropleth  
   
 library(ggvis)
