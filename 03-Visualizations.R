@@ -20,7 +20,7 @@ noreast <- filter(fil.data, reg == "NE")
 norwest <- filter(fil.data, reg == "NW")
 west <- filter(fil.data, reg == "SW")
 
-##3: Basic Visualizations ####
+#3: Basic Visualizations ####
 
 library(ggvis)
 library(ggplot2)
@@ -46,9 +46,7 @@ tert %>%
   layer_smooths() %>%
   layer_model_predictions(model = "lm", stroke := "red", se = TRUE)
 
-
-
-#Distribution of Travel by Pattern ####
+##Distribution of Travel by Pattern ####
 fwy %>% 
   ggvis(~travel.pattern, ~aadt) %>%
   layer_histograms()
@@ -56,7 +54,7 @@ fwy %>%
 fwyhist <- select(fwy, travel.pattern, aadt)
 hist(fwyhist$aadt)
 
-#ggmap Mapping ####
+##ggmap Mapping ####
 
 library(ggmap)
 library(mapproj)
@@ -65,7 +63,7 @@ ggmap(map)
 
 ---
 
-#Mosaic Plotsi ####
+##Mosaic Plots ####
 
 library(dplyr)  
 library(vcd)
@@ -81,7 +79,7 @@ mosaicplot(mytable, main="Region vs. Travel Pattern",
 #Talk about differences between sqkm landmass and population of north and south ontario
 ---
 
-# Correspondence Analysis for all Regions ####
+##Correspondence Analysis for all Regions ####
   
 library(ca)
 mytable <- table(fil.data$reg,fil.data$travel.pattern) # A will be rows, B will be columns 
@@ -98,7 +96,8 @@ plot(fit, mass = TRUE, contrib = "absolute", map =
 ---
 ---
   
-#Interactive Map and Choropleth ####
+
+##Interactive Map and Choropleth ####
   
 library(ggvis)
 library(rgdal)
