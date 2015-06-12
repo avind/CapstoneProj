@@ -212,3 +212,9 @@ chisq.test(mytable)
 #Measure of Association between Region and Travel Pattern
 library(vcd)
 assocstats(mytable)
+
+# One-Way Permutation Test based on 9999 Monte-Carlo resamplings. 
+library(coin)
+oneway_test(aadt~travel.pattern, data=noreast,
+            distribution=approximate(B=9999))
+

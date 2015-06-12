@@ -67,9 +67,16 @@ ggmap(map)
 
 library(dplyr)  
 library(vcd)
-mos.data <- select(fil.data, travel.pattern, reg)
-mosaic(mytable, legend=TRUE)  
+mytable <- table(fil.data$reg,fil.data$travel.pattern) 
 
+
+mosaic(mytable,  shade=TRUE,legend=TRUE, split_vertical=NULL)  
+
+mosaicplot(mytable, main="Region vs. Travel Pattern",
+           xlab="Travel Pattern",ylab="Region",
+           col=c(3:16))
+
+#Talk about differences between sqkm landmass and population of north and south ontario
 ---
 
 # Correspondence Analysis for all Regions
