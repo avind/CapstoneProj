@@ -1,5 +1,6 @@
 ## Import ####
 
+library(dplyr)
 fil.data <- readRDS("fil.data.rds")
 central <- readRDS("central.rds")
 eastern <- readRDS("eastern.rds")
@@ -32,7 +33,7 @@ library(psych)
 describe(fil.data)
 #cor(renamed.raw)
 
-###multiplot function ####
+###Multiplot function ####
 #From R Cookbook: http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot1)/
 
 # Multiple plot function
