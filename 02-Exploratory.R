@@ -180,17 +180,25 @@ fil.data %>%
 
 ##Boxplots for Regions ####
 
-boxplot(aadt ~ travel.pattern, data = fil.data, ylab = "AADT for All Regions")  
+par(mfrow=c(3,3))
 
-boxplot(aadt ~ travel.pattern, data = central, ylab = "AADT for All Regions")  
+boxplot(aadt ~ travel.pattern, data = fil.data, 
+        main = "AADT for All Regions", ylab = "AADT", xlab = "Travel Pattern")  
 
-boxplot(aadt ~ travel.pattern, data = eastern, ylab = "AADT for All Regions")  
+boxplot(aadt ~ travel.pattern, data = central, 
+        main = "AADT for All Central", ylab = "AADT", xlab = "Travel Pattern")   
 
-boxplot(aadt ~ travel.pattern, data = noreast, ylab = "AADT for All Regions")  
+boxplot(aadt ~ travel.pattern, data = eastern, 
+        main = "AADT for All Eastern", ylab = "AADT", xlab = "Travel Pattern")   
 
-boxplot(aadt ~ travel.pattern, data = norwest, ylab = "AADT for All Regions")  
+boxplot(aadt ~ travel.pattern, data = noreast, 
+        main = "AADT for All NorthEast", ylab = "AADT", xlab = "Travel Pattern")  
 
-boxplot(aadt ~ travel.pattern, data = west, ylab = "AADT for All Regions")  
+boxplot(aadt ~ travel.pattern, data = norwest, 
+        main = "AADT for All NorthWest", ylab = "AADT", xlab = "Travel Pattern")  
+
+boxplot(aadt ~ travel.pattern, data = west, 
+        main = "AADT for All West", ylab = "AADT", xlab = "Travel Pattern")   
 
 ##Frequency Tables for Region and Travel Pattern ####
 
