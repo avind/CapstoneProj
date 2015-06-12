@@ -9,8 +9,7 @@ raw2 <- raw[-1:-2,] #remove extraneous rows (French and blank row) to allow "rea
 raw3 <- type_convert(raw2)
 str(raw3) #check datatypes
 
-#1: Initial Cleaning
-
+#1: Initial Cleaning ####
 
 #rename columns
 #lib - dplyr
