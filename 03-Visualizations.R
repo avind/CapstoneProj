@@ -72,7 +72,7 @@ mosaic(mytable, legend=TRUE)
 
 ---
 
-# Correspondence Analysis
+# Correspondence Analysis for all Regions
   
 library(ca)
 mytable <- table(fil.data$reg,fil.data$travel.pattern) # A will be rows, B will be columns 
