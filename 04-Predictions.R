@@ -150,7 +150,6 @@ as.data.frame(sub.sum$outmat)
   
 ------------------
 ------------------
-
-
-
-
+#Factorial Logistic Regression
+  
+summary(glm(travel.pattern ~ aadt, data = fil.data, family = binomial))
