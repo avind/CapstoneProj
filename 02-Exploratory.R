@@ -1,4 +1,4 @@
-# Import ####
+## Import ####
 
 fil.data <- readRDS("fil.data.rds")
 central <- readRDS("central.rds")
@@ -20,7 +20,7 @@ noreast <- filter(fil.data, reg == "NE")
 norwest <- filter(fil.data, reg == "NW")
 west <- filter(fil.data, reg == "SW")
 
-##2: Exploratory ####
+#2: Exploratory ####
 
 library(pastecs)
 library(dplyr)
@@ -32,8 +32,7 @@ library(psych)
 describe(fil.data)
 #cor(renamed.raw)
 
-## Histograms ####
-
+###multiplot function ####
 #From R Cookbook: http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot1)/
 
 # Multiple plot function
@@ -81,6 +80,8 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
     }
   }
 }
+
+# Histograms ####
 
 #describe distribution of patterns by region
 #central
@@ -156,7 +157,6 @@ fil.data %>%
   layer_smooths() %>%
   title= "Year ~ AADT"
 
-
 ##Distribution of AADT, SADT, SAWDT, and WADT ####
 
 datadis <- select(fil.data, aadt, sadt, sawdt, wadt)
@@ -164,7 +164,6 @@ boxplot(datadis,
         main="Distribution of Data",
         ylab="Value",
         xlab="Data Type")
-
 
 ##Histograms of Highway Type ####
 
@@ -179,7 +178,7 @@ fil.data %>%
   ggvis(~year, ~aadt, fill = ~hwy.type) %>%
   layer_densities()
 
-#Boxplots for Regions ####
+##Boxplots for Regions ####
 
 boxplot(aadt ~ travel.pattern, data = fil.data, ylab = "AADT for All Regions")  
 
@@ -193,7 +192,7 @@ boxplot(aadt ~ travel.pattern, data = norwest, ylab = "AADT for All Regions")
 
 boxplot(aadt ~ travel.pattern, data = west, ylab = "AADT for All Regions")  
 
-#Frequency Tables for Region and Travel Pattern ####
+##Frequency Tables for Region and Travel Pattern ####
 
 # 2-Way Frequency Table 
 mytable <- table(fil.data$reg,fil.data$travel.pattern) # A will be rows, B will be columns 
@@ -206,17 +205,17 @@ prop.table(mytable) # cell percentages
 prop.table(mytable, 1) # row percentages 
 prop.table(mytable, 2) # column percentages
 
-#Crosstable ####
+##Crosstable ####
 library(gmodels)
 CrossTable(fil.data$reg,fil.data$travel.pattern)
 
 chisq.test(mytable)
 
-#Measure of Association between Region and Travel Pattern ####
+##Measure of Association between Region and Travel Pattern ####
 library(vcd)
 assocstats(mytable)
 
-# One-Way Permutation Test based on 9999 Monte-Carlo resamplings. ####
+##One-Way Permutation Test based on 9999 Monte-Carlo resamplings. ####
 library(coin)
 oneway_test(aadt~travel.pattern, data=noreast,
             distribution=approximate(B=9999))
