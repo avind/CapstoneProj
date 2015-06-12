@@ -144,12 +144,8 @@ four <- filter(fil.data, hwy.num %in% target)
 #select for the remaining non-400 series freeways (the QEW) 
 qew <- filter(fwy, !(hwy.num %in% target))
 
-
-
 summary(lm(sadt~aadt, data=fil.data))
 plot(fil.data$sadt~fil.data$aadt, xlab="SADT", ylab="AADT", main="Plot of SADT and AADT")
-
-
 
 fil.data %>%
   group_by(hwy.type) %>%
@@ -180,4 +176,39 @@ fil.data %>%
   ggvis(~year, ~aadt, fill = ~hwy.type) %>%
   layer_densities()
 
+#Boxplots for Regions
 
+boxplot(aadt ~ travel.pattern, data = fil.data, ylab = "AADT for All Regions")  
+
+boxplot(aadt ~ travel.pattern, data = central, ylab = "AADT for All Regions")  
+
+boxplot(aadt ~ travel.pattern, data = eastern, ylab = "AADT for All Regions")  
+
+boxplot(aadt ~ travel.pattern, data = noreast, ylab = "AADT for All Regions")  
+
+boxplot(aadt ~ travel.pattern, data = norwest, ylab = "AADT for All Regions")  
+
+boxplot(aadt ~ travel.pattern, data = west, ylab = "AADT for All Regions")  
+
+#Frequency Tables for Region and Travel Pattern
+
+# 2-Way Frequency Table 
+mytable <- table(fil.data$reg,fil.data$travel.pattern) # A will be rows, B will be columns 
+mytable # print table 
+
+margin.table(mytable, 1) # A frequencies (summed over B) 
+margin.table(mytable, 2) # B frequencies (summed over A)
+
+prop.table(mytable) # cell percentages
+prop.table(mytable, 1) # row percentages 
+prop.table(mytable, 2) # column percentages
+
+#Crosstable
+library(gmodels)
+CrossTable(fil.data$reg,fil.data$travel.pattern)
+
+chisq.test(mytable)
+
+#Measure of Association between Region and Travel Pattern
+library(vcd)
+assocstats(mytable)
