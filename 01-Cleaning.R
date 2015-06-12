@@ -9,13 +9,11 @@ raw2 <- raw[-1:-2,] #remove extraneous rows (French and blank row) to allow "rea
 raw3 <- type_convert(raw2)
 str(raw3) #check datatypes
 
-#1: Initial Cleaning ####
-
-#rename columns
+#Rename columns ####
 #lib - dplyr
 renamed.raw <- rename(raw3, "lhrs" = LHRS,"OS" =`O/S`, "year" = Year, "hwy.num" = `Hwy #`, "hwy.let" = `Hwy Let`, "hwy.type" = `Hwy Type (Text)`, "location" = `Location Description`, "reg" = Reg, "section.len" = `Section Length`, "conn.link.len" = `Connecting Link Length`, "sec.description" = `Secondary Description (for Connecting Links, Regional Boundarys,etc)`, "travel.pattern" = `Travel Pattern`, "dhv.percent" = `DHV %`, "directional.split" = `Directional Split`, "aadt" = AADT, "annual.aadt.change" = `Yearly % Change in AADT`, "decade.change" = `10 Year % Change in AADT`, "sadt" = SADT, "sawdt" = SAWDT, "wadt" = WADT)
 
-#checking for NAs
+#Checking for NAs ####
 length(renamed.raw$lhrs)
 length(renamed.raw$year)
 length(renamed.raw$aadt)
@@ -26,7 +24,7 @@ sum(is.na(renamed.raw$wadt))
 sum(renamed.raw$year=="9999")
 #there are 553 NA entries for aadt. year is also set to 9999 for these entries
 
-#removing NAs and duplicate entries
+#Removing NAs and duplicate entries ####
 fil.data <- renamed.raw %>%
   distinct() %>%
   filter(year!="9999", travel.pattern!="UNC", travel.pattern!="UKN")
@@ -37,12 +35,12 @@ length(fil.data$travel.pattern)
 
 glimpse(fil.data)
 
-#convert travel.pattern and region to factor
+#convert travel.pattern and region to factor ####
 fil.data$travel.pattern <-  factor(fil.data$travel.pattern)
 fil.data$reg <- factor(fil.data$reg)
 is.factor(fil.data$travel.pattern)
 
-#grouping data by regions: Central, Eastern, Northeastern, Northwestern, West
+#grouping data by regions: Central, Eastern, Northeastern, Northwestern, West ####
 central <- filter(fil.data, reg == "CR")
 eastern <- filter(fil.data, reg == "ER")
 noreast <- filter(fil.data, reg == "NE")
