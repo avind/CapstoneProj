@@ -24,7 +24,7 @@ west <- filter(fil.data, reg == "SW")
 ------------------
 ------------------
 
-#Linear Models for each Region 
+#Linear Models for All RegionS 
   
 #par(mfrow=c(2,2))
 
@@ -32,8 +32,7 @@ west <- filter(fil.data, reg == "SW")
 
 ###Strength of Association  
 
-boxplot(aadt ~ travel.pattern, data = fil.data, ylab = "AADT for All Regions")  
-        
+
 lmfit0 <- lm (aadt ~ travel.pattern, data=fil.data)
 summary(lmfit0)
 plot(lmfit0)
@@ -56,37 +55,12 @@ library(heplots) # for eta
 model.aov <- aov(aadt ~ travel.pattern, data = fil.data)
 summary(model.aov)
 
-###Fit for Each Region
-
-lmfit1 <- lm (aadt ~ travel.pattern, data=central)
-summary(lmfit1)
-plot(lmfit1)
-anova(lmfit1)
-
-lmfit2 <- lm (aadt ~ travel.pattern, data=eastern)
-summary(lmfit2)
-plot(lmfit2)
-
-lmfit3<- lm (aadt ~ travel.pattern, data=noreast)
-summary(lmfit3)
-plot(lmfit3)
-
-lmfit4<- lm (aadt ~ travel.pattern, data=norwest)
-summary(lmfit4)
-plot(lmfit4)
-
-lmfit5<- lm (aadt ~ travel.pattern, data=west)
-summary(lmfit5)
-plot(lmfit5)
 
 #for possible later extraction:
 #fitted(lmmodel1)
 #coef(lmmodel1)
 #residuals(lmmodel1)
 #names(lmmodel1)
-
-------------------
-------------------
 
 #Model Building with AADT and Traffic Pattern
 
@@ -167,50 +141,8 @@ sub.sum <- summary(subsets)
 as.data.frame(sub.sum$outmat)
 
 ------------------
-------------------
-#Central Region
-subsets<-regsubsets(aadt~travel.pattern,data=central,
-                      nbest=1,)
-sub.sum <- summary(subsets)
-as.data.frame(sub.sum$outmat)
-------------------
-------------------  
-#Eastern Region
-subsets<-regsubsets(aadt~travel.pattern,data=eastern,
-                    nbest=1,)
-sub.sum <- summary(subsets)
-as.data.frame(sub.sum$outmat)
-------------------
-------------------
-#Northeast
-subsets<-regsubsets(aadt~travel.pattern,data=noreast,
-                    nbest=1,)
-sub.sum <- summary(subsets)
-as.data.frame(sub.sum$outmat)
-------------------
-------------------
-#Northwest
-subsets<-regsubsets(aadt~travel.pattern,data=norwest,
-                    nbest=1,)
-sub.sum <- summary(subsets)
-as.data.frame(sub.sum$outmat) 
-------------------
-------------------
-#Western
-subsets<-regsubsets(aadt~travel.pattern,data=west,
-                    nbest=1,)
-sub.sum <- summary(subsets)
-as.data.frame(sub.sum$outmat)
+-----------------  
 
-------------------
-------------------  
-    
-
-
-
-
-
-------------------
 ------------------
 
 #Decision Tree Classification
