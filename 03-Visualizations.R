@@ -63,6 +63,31 @@ ggmap(map)
 
 ---
 
+#Mosaic Plots
+
+library(dplyr)  
+library(vcd)
+mos.data <- select(fil.data, travel.pattern, reg)
+mosaic(mytable, legend=TRUE)  
+
+---
+
+# Correspondence Analysis
+  
+library(ca)
+mytable <- table(fil.data$reg,fil.data$travel.pattern) # A will be rows, B will be columns 
+mytable <- with(mydata, table(A,B)) # create a 2 way table
+prop.table(mytable, 1) # row percentages
+prop.table(mytable, 2) # column percentages
+fit <- ca(mytable)
+print(fit) # basic results 
+summary(fit) # extended results 
+plot(fit) # symmetric map
+plot(fit, mass = TRUE, contrib = "absolute", map =
+       "rowgreen", arrows = c(FALSE, TRUE)) # asymmetric map  
+  
+---
+
 #Interactive Map and Choropleth  
   
 library(ggvis)
