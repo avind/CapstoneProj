@@ -100,6 +100,57 @@ p1 <- ggplot(central$aadt, aes(x=aadt) + geom_histogram(fill="#FF9999", colour="
 
 ggplot(central$aadt, aes(x=aadt) + geom_bar())
 
+d1 <- ggplot(fil.data,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("All Regions") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+             color="red", linetype="dashed", size=1)
+
+d2 <- ggplot(central,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("Central") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+             color="red", linetype="dashed", size=1)
+
+d3 <- ggplot(eastern,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("Eastern") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+             color="red", linetype="dashed", size=1)
+
+d4 <- ggplot(noreast,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("Northeast") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+             color="red", linetype="dashed", size=1)
+
+d5 <- ggplot(norwest,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("Northwest") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+             color="red", linetype="dashed", size=1)
+ 
+d6 <- ggplot(west,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("West") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+             color="red", linetype="dashed", size=1)
+
+multiplot(d1, d2, d3, d4, d5, d6, cols=3)
+
+
 p1 <- qplot(central$aadt,
             geom="histogram",
             main = "Histogram for Central",
