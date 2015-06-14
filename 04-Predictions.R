@@ -22,18 +22,38 @@ norwest <- filter(fil.data, reg == "NW")
 west <- filter(fil.data, reg == "SW")
 
 #Linear Models for All Regions ####
+
+old.par <- par()
   
-#par(mfrow=c(2,2))
+par(mfrow=c(2,2))
 
 ##Fit for All Regions
 
 ###Strength of Association  
 
+stripchart(aadt~travel.pattern,method="jitter",jitter=0.5,vertical=T,pch=19, data=fil.data) 
 
 lmfit0 <- lm (aadt ~ travel.pattern, data=fil.data)
 summary(lmfit0)
-plot(lmfit0)
 anova(lmfit0)
+plot(lmfit0)
+
+par(old.par)
+
+ggplotRegression <- function (fit) {
+  
+  require(ggplot2)
+  
+  ggplot(fit$model, aes_string(x = names(fit$model)[2], y = names(fit$model)[1])) + 
+    geom_point() +
+    stat_smooth(method = "lm", col = "red") +
+    labs(title = paste("Adj R2 = ",signif(summary(fit)$adj.r.squared, 5),
+                       "Intercept =",signif(fit$coef[[1]],5 ),
+                       " Slope =",signif(fit$coef[[2]], 5),
+                       " P =",signif(summary(fit)$coef[2,4], 5)))
+}
+
+ggplotRegression(lmfit0)
 
 rsq0 <- summary(lmfit0)$r.squared
 rsq0
