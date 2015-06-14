@@ -30,7 +30,7 @@ stat.desc(explor.stat)
 
 
 library(psych)
-describe(fil.data)
+describe(explor.stat)
 #cor(renamed.raw)
 
 ###Multiplot function ####
@@ -96,35 +96,39 @@ ggvis(central, ~aadt, fill:= "#fff8dc") %>%
 
 library(ggplot2)
 
+p1 <- ggplot(central$aadt, aes(x=aadt) + geom_histogram(fill="#FF9999", colour="black"))
+
+ggplot(central$aadt, aes(x=aadt) + geom_bar())
+
 p1 <- qplot(central$aadt,
             geom="histogram",
             main = "Histogram for Central",
-            xlab = "AADT")
+            xlab = "AADT") + theme(panel.background = element_rect(fill = 'white', colour = 'black')) + geom_histogram(colour="black", fill="grey")
 
 p2 <- qplot(eastern$aadt,
             geom="histogram",
             main = "Histogram for Eastern",
-            xlab = "AADT")
+            xlab = "AADT") + theme(panel.background = element_rect(fill = 'white', colour = 'black')) + geom_histogram(colour="black", fill="grey") 
 
 p3 <- qplot(noreast$aadt,
             geom="histogram",
             main = "Histogram for Northeastern",
-            xlab = "AADT")
+            xlab = "AADT") + theme(panel.background = element_rect(fill = 'white', colour = 'black')) + geom_histogram(colour="black", fill="grey")
 
 p4 <- qplot(norwest$aadt,
             geom="histogram",
             main = "Histogram for Northwestern",
-            xlab = "AADT")
+            xlab = "AADT") + theme(panel.background = element_rect(fill = 'white', colour = 'black')) + geom_histogram(colour="black", fill="grey") 
 
 p5 <- qplot(west$aadt,
             geom="histogram",
             main = "Histogram for West",
-            xlab = "AADT")
+            xlab = "AADT") + theme(panel.background = element_rect(fill = 'white', colour = 'black')) + geom_histogram(colour="black", fill="grey") 
 
 p6 <- qplot(fil.data$aadt,
             geom="histogram",
             main = "Histogram for All Regions",
-            xlab = "AADT")
+            xlab = "AADT") + theme(panel.background = element_rect(fill = 'white', colour = 'black')) + geom_histogram(colour="black", fill="grey")
 
 multiplot(p1, p2, p3, p4, p5, p6, cols=3)
 
