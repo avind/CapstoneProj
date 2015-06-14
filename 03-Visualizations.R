@@ -226,13 +226,28 @@ map %<>% mutate(id=gsub(" County, ME", "", id)) %>%
 # this is for the tooltip. it does a lookup into the crime data frame and
 # then uses those values for the popup
 
-crime_values <- function(x) {
+aadt_values <- function(x) {
   if(is.null(x)) return(NULL)
-  y <- me_crime %>% filter(year==2013, county==x$id) %>% select(1,5:12)
+  y <- yeartest %>% filter(year==x$year, reg==x$group) 
   sprintf("<table width='100%%'>%s</table>",
           paste0("<tr><td style='text-align:left'>", names(y),
                  ":</td><td style='text-align:right'>", format(y), collapse="</td></tr>"))
-}
+}map %>%
+  group_by(group, id) %>%
+  ggvis(~long, ~lat) %>%
+  layer_paths(fill=input_select(label="AADT:",
+                                choices= yeartest %>%
+                                  select(avg) %>%
+                                  colnames %>% sort,
+                                id="AADT",
+                                map=id),
+              strokeWidth:=0.5, stroke:="white") %>%
+  scale_numeric("fill", range=c("#bfd3e6", "#8c6bb1" ,"#4d004b")) %>%
+  add_tooltip(aadt_values, "hover") %>%
+  add_legend("fill", title="Average AADT") %>%
+  hide_axis("x") %>% hide_axis("y") %>%
+  set_options(width=700, height=600, keep_aspect=TRUE)
+
 
 map %>%
   group_by(group, id) %>%
@@ -256,25 +271,5 @@ yeartest
 
 yeartestgrp <- rename(yeartest, "group"=reg)
 
-map %>%
-  group_by(group, id) %>%
-  ggvis(~long, ~lat) %>%
-  layer_paths(fill=input_select(label="AADT:",
-                                choices= yeartest %>%
-                                  select(avg) %>%
-                                  colnames %>% sort,
-                                id="AADT",
-                                map=id),
-              strokeWidth:=0.5, stroke:="white") %>%
-  scale_numeric("fill", range=c("#bfd3e6", "#8c6bb1" ,"#4d004b")) %>%
-  add_legend("fill", title="Average AADT") %>%
-  hide_axis("x") %>% hide_axis("y") %>%
-  set_options(width=700, height=600, keep_aspect=TRUE)
 
 
-rawYoYLines <- melt_rawYoY %>% 
-  ggvis(x = ~Year, y = ~YoY) %>% 
-  filter(regionIDs == eval(input_select(choices = regionIDs, label = "Region"))) %>% 
-  layer_lines() $>$ 
-  add_axis("x", value = c("1968", "1973", "1978", "1983", "1988",  "1993","1998", "2003"))
-rawYoYLines
