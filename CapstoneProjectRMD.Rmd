@@ -58,20 +58,96 @@ norwest <- filter(fil.data, reg == "NW")
 west <- filter(fil.data, reg == "SW")
 
 ```
-There are `r sum(renamed.raw$year=="9999")` incomplete entries. These entries are set to Year "9999" and have no values for AADT and the related variables.
 
-There are `r length(fil.data$aadt)` remaining observations
-
-```{r Exploratory Analysis, echo=FALSE, warning= FALSE, message=FALSE}
-
-```
-
-##Exploratation
+##Exploration
 
 ```{r}
 
 ```
+- Number of entries for each pattern
+- 
 
+
+###Boxplots
+```{r Boxplots of Travel Patterns, echo=FALSE, warning= FALSE, message=FALSE}
+d1 <- ggplot(fil.data,aes(x=travel.pattern, y = aadt))+
+  geom_boxplot(aes()) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_boxplot(colour="black", fill="grey") + ggtitle("All Regions") + xlab("AADT") +
+  ylab("Frequency") 
+
+d2 <- ggplot(central,aes(x=travel.pattern, y = aadt))+
+  geom_boxplot(aes()) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_boxplot(colour="black", fill="grey") + ggtitle("Central") + xlab("AADT") +
+  ylab("Frequency") 
+
+d3 <- ggplot(eastern,aes(x=travel.pattern, y = aadt))+
+  geom_boxplot(aes()) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_boxplot(colour="black", fill="grey") + ggtitle("Eastern") + xlab("AADT") +
+  ylab("Frequency") 
+
+d4 <- ggplot(noreast,aes(x=travel.pattern, y = aadt))+
+  geom_boxplot(aes()) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_boxplot(colour="black", fill="grey") + ggtitle("Northeast") + xlab("AADT") +
+  ylab("Frequency") 
+
+d5 <- ggplot(norwest,aes(x=travel.pattern, y = aadt))+
+  geom_boxplot(aes()) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_boxplot(colour="black", fill="grey") + ggtitle("Northwest") + xlab("AADT") +
+  ylab("Frequency") 
+
+d6 <- ggplot(west,aes(x=travel.pattern, y = aadt))+
+  geom_boxplot(aes()) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_boxplot(colour="black", fill="grey") + ggtitle("Western") + xlab("AADT") +
+  ylab("Frequency") 
+
+multiplot(d1, d2, d3, d4, d5, d6, cols=3)
+```
+
+###AADT ~ Years
+```{r AADT over Time, echo=FALSE, warning= FALSE, message=FALSE}
+add_title <- function(vis, ..., x_lab = "X units", title = "Plot Title") 
+{
+  add_axis(vis, "x", title = x_lab) %>% 
+    add_axis("x", orient = "top", ticks = 0, title = title,
+             properties = axis_props(
+               axis = list(stroke = "white"),
+               title = list(fontSize = 26),
+               labels = list(fontSize = 0)
+             ), ...)
+}
+
+fwy %>% 
+  ggvis(~year, ~aadt) %>%
+  layer_smooths() %>%
+  layer_model_predictions(model = "lm", stroke := "red", se = TRUE) %>%
+  add_title(title = "Freeway", x_lab="Year")
+
+king %>% 
+  ggvis(~year, ~aadt) %>%
+  layer_smooths() %>%
+  layer_model_predictions(model = "lm", stroke := "red", se = TRUE) %>%
+  add_title(title = "King's Highway", x_lab="Year")
+
+secon %>% 
+  ggvis(~year, ~aadt) %>%
+  layer_smooths() %>%
+  layer_model_predictions(model = "lm", stroke := "red", se = TRUE) %>%
+  add_title(title = "Secondary Highway", x_lab="Year")
+
+tert %>% 
+  ggvis(~year, ~aadt) %>%
+  layer_smooths() %>%
+  layer_model_predictions(model = "lm", stroke := "red", se = TRUE) %>%
+  add_title(title = "Tertiary Highway", x_lab="Year")
+
+
+```
 
 ###Histograms
 ```{r Histogram of Regions, echo=FALSE, warning= FALSE, message=FALSE}
@@ -181,4 +257,103 @@ d6 <- ggplot(west,aes(x=aadt))+
 multiplot(d1, d2, d3, d4, d5, d6, cols=3)
 ```
 
+```{r Histogram of Travel Pattern, echo=FALSE, warning= FALSE, message=FALSE}
+##Distribution of Travel by Pattern ####
+c1 <- ggplot(fwy,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("Freeways") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+             color="red", linetype="dashed", size=1)
+
+c2 <- ggplot(king,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("King's") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+             color="red", linetype="dashed", size=1)
+
+c3 <- ggplot(secon,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("Secondary") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+             color="red", linetype="dashed", size=1)
+
+c4 <- ggplot(tert,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("Tertiary") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+             color="red", linetype="dashed", size=1)
+
+multiplot(c1, c2, c3, c4, cols=2)
+```
+
 The histograms for the regions show a predictable trend and all are positively skewed. Less populated regions such as Northwest and Northeast both showcase a larger proportion of lower AADT values than more populated regions such as Central and West. Regions such as Central, Western, and Eastern all showcase a greater proportion of larger AADT values with West being the only region where the lowest AADT values are not the most dominant on the histogram. This can probably be attributed to it's proximity to the Canada-United States border.
+
+```{r Mosiac Plot, echo=FALSE, warning= FALSE, message=FALSE}
+##Mosaic Plots ####
+
+library(dplyr)  
+library(vcd)
+mytable <- table(fil.data$reg,fil.data$travel.pattern) 
+
+
+mosaic(mytable,  shade=TRUE,legend=TRUE, split_vertical=NULL)  
+
+mosaicplot(mytable, main="Region vs. Travel Pattern",
+           xlab="Travel Pattern",ylab="Region",
+           col=c(3:16), legend=TRUE)
+
+#Talk about differences between sqkm landmass and population of north and south ontario
+---
+```
+  
+``` {r Correspondence Analysis, echo=FALSE, warning= FALSE, message=FALSE}  
+##Correspondence Analysis for All Regions ####
+  
+library(ca)
+mytable <- table(fil.data$reg,fil.data$travel.pattern) # A will be rows, B will be columns 
+mytable <- with(mydata, table(A,B)) # create a 2 way table
+prop.table(mytable, 1) # row percentages
+prop.table(mytable, 2) # column percentages
+fit <- ca(mytable)
+print(fit) # basic results 
+summary(fit) # extended results 
+plot(fit) # symmetric map
+plot(fit, mass = TRUE, contrib = "absolute", map =
+       "rowgreen", arrows = c(FALSE, TRUE)) # asymmetric map  
+  
+```
+
+
+##Predictions
+
+```{r Linear Modelling All Regions, echo=FALSE, warning= FALSE, message=FALSE}
+
+```
+
+```{r Linear Modelling Central, echo=FALSE, warning= FALSE, message=FALSE}
+
+```
+
+```{r Linear Modelling Eastern, echo=FALSE, warning= FALSE, message=FALSE}
+
+```
+
+```{r Linear Modelling Northeastern, echo=FALSE, warning= FALSE, message=FALSE}
+
+```
+
+```{r Linear Modelling Northwestern, echo=FALSE, warning= FALSE, message=FALSE}
+
+```
+
+```{r Linear Modelling Western, echo=FALSE, warning= FALSE, message=FALSE}
+
+```
