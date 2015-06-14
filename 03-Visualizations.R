@@ -144,41 +144,46 @@ map %>%
 
 #basic choropleth
 
-#read in data and convert to appropriate form for mapping
-
-#read in some crime & population data for maine counties
-
-#me_pop <- read.csv("me_pop.csv", stringsAsFactors=FALSE)
-#me_crime <- read.csv("me_crime.csv", stringsAsFactors=FALSE)
+#read in data and convert to appropriate form for mapping ####
 
 library(dplyr)
-map.datum <- select(fil.data, year, reg, aadt, annual.aadt.change, decade.change)
-map.datum$reg <- as.character(map.datum$reg)
-map.data <- rename(map.datum, "Central" = `CR`, "East" = `ER`, "North" = `NE`, "North" = `NW`, "West" = `SW`)  
+map.data <- select(fil.data, year, reg, aadt, annual.aadt.change, decade.change)
+map.data$reg <- as.character(map.data$reg)
 
-map.data$re
-SchoolData$Grade[SchoolData$Grade==5] <- "Grade Five"
+map.data$reg[map.data$reg=="CR"] <- "Central"
+map.data$reg[map.data$reg=="ER"] <- "East"
+map.data$reg[map.data$reg=="NE"] <- "North"
+map.data$reg[map.data$reg=="NW"] <- "North"
+map.data$reg[map.data$reg=="SW"] <- "West"
 
+map.data$reg <- factor(map.data$reg)
 
 ## Aggregate data by week into data by Year
-
-#AADTbyYear <- aggregate(map.data, by = list(map.data$reg), FUN=mean)
-#AADTbyYear <- AADTbyYear[-c(2,3)]
-#colnames(AADTbyYear)[1] <- "Year"
-
-
 
 yeartest <- map.data %>%
   group_by(reg, year) %>%
   summarise(avg = mean(aadt))
+
 
 ## Transpose dataframe to make columns by Year
 yeartestt <- t(yeartest)
 colnames(yeartestt) <- yeartestt[2,]
 yeartestt <- yeartestt[-c(2),]
 
-  
-  
+## ggvis explorations
+regionIDs <- as.vector(unique(yeartest$reg))
+Years <- as.vector(unique(yeartest$year))
+yeartest$year <- as.character(yeartest$year)
+
+## bar chart w/selectable Years
+RegionBars <- yeartest %>% 
+  ggvis(x = ~reg, y = ~avg) %>% 
+  filter(year == eval(input_radiobuttons(choices = Years, label = "Years"))) %>% 
+  layer_points()
+
+RegionBars
+
+#### not sure if need####
 ## merge state names with Region definitions
 MumpsbyYearTRegion <- merge(MumpsbyYearT, Regions, by.x="row.names", by.y="State")
 MumpsbyYearTRegion$Region = as.character(MumpsbyYearTRegion$Region)
@@ -244,3 +249,32 @@ map %>%
   add_legend("fill", title="Crime Rate/1K Pop") %>%
   hide_axis("x") %>% hide_axis("y") %>%
   set_options(width=400, height=600, keep_aspect=TRUE)
+
+map
+regions
+yeartest
+
+yeartestgrp <- rename(yeartest, "group"=reg)
+
+map %>%
+  group_by(group, id) %>%
+  ggvis(~long, ~lat) %>%
+  layer_paths(fill=input_select(label="AADT:",
+                                choices= yeartest %>%
+                                  select(avg) %>%
+                                  colnames %>% sort,
+                                id="AADT",
+                                map=id),
+              strokeWidth:=0.5, stroke:="white") %>%
+  scale_numeric("fill", range=c("#bfd3e6", "#8c6bb1" ,"#4d004b")) %>%
+  add_legend("fill", title="Average AADT") %>%
+  hide_axis("x") %>% hide_axis("y") %>%
+  set_options(width=700, height=600, keep_aspect=TRUE)
+
+
+rawYoYLines <- melt_rawYoY %>% 
+  ggvis(x = ~Year, y = ~YoY) %>% 
+  filter(regionIDs == eval(input_select(choices = regionIDs, label = "Region"))) %>% 
+  layer_lines() $>$ 
+  add_axis("x", value = c("1968", "1973", "1978", "1983", "1988",  "1993","1998", "2003"))
+rawYoYLines
