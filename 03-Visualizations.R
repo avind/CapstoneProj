@@ -26,34 +26,82 @@ west <- filter(fil.data, reg == "SW")
 library(ggvis)
 library(ggplot2)
 
+qplot(year, aadt, data=fwy, position="jitter") + 
+  geom_smooth()
+
+ggplot(fwy, aes(x=year, y=aadt)) + geom_smooth() + geom_abline(data=fwy, aes(intercept=a, slope=b))
+
+add_title <- function(vis, ..., x_lab = "X units", title = "Plot Title") 
+{
+  add_axis(vis, "x", title = x_lab) %>% 
+    add_axis("x", orient = "top", ticks = 0, title = title,
+             properties = axis_props(
+               axis = list(stroke = "white"),
+               title = list(fontSize = 26),
+               labels = list(fontSize = 0)
+             ), ...)
+}
 
 fwy %>% 
-  ggvis(~travel.pattern, ~aadt) %>%
+  ggvis(~year, ~aadt) %>%
   layer_smooths() %>%
-  layer_model_predictions(model = "lm", stroke := "red", se = TRUE)
+  layer_model_predictions(model = "lm", stroke := "red", se = TRUE) %>%
+  add_title(title = "Freeway", x_lab="Year")
 
 king %>% 
   ggvis(~year, ~aadt) %>%
   layer_smooths() %>%
-  layer_model_predictions(model = "lm", stroke := "red", se = TRUE)
+  layer_model_predictions(model = "lm", stroke := "red", se = TRUE) %>%
+  add_title(title = "King's Highway", x_lab="Year")
 
 secon %>% 
   ggvis(~year, ~aadt) %>%
   layer_smooths() %>%
-  layer_model_predictions(model = "lm", stroke := "red", se = TRUE)
+  layer_model_predictions(model = "lm", stroke := "red", se = TRUE) %>%
+  add_title(title = "Secondary Highway", x_lab="Year")
 
 tert %>% 
   ggvis(~year, ~aadt) %>%
   layer_smooths() %>%
-  layer_model_predictions(model = "lm", stroke := "red", se = TRUE)
+  layer_model_predictions(model = "lm", stroke := "red", se = TRUE) %>%
+  add_title(title = "Tertiary Highway", x_lab="Year")
+
+
 
 ##Distribution of Travel by Pattern ####
-fwy %>% 
-  ggvis(~travel.pattern, ~aadt) %>%
-  layer_histograms()
+c1 <- ggplot(fwy,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("Freeways") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+             color="red", linetype="dashed", size=1)
 
-fwyhist <- select(fwy, travel.pattern, aadt)
-hist(fwyhist$aadt)
+c2 <- ggplot(king,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("King's") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+             color="red", linetype="dashed", size=1)
+
+c3 <- ggplot(secon,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("Secondary") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+             color="red", linetype="dashed", size=1)
+
+c4 <- ggplot(tert,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("Tertiary") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+             color="red", linetype="dashed", size=1)
+
+multiplot(c1, c2, c3, c4, cols=2)
 
 ##ggmap Mapping ####
 
