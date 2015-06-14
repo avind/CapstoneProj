@@ -228,12 +228,6 @@ fil.data %>%
   ggvis (~year, ~aadt, fill=~hwy.type) %>%
   layer_histograms() 
 
-
-fil.data %>%
-  group_by(hwy.type) %>%
-  ggvis(~year, ~aadt, fill = ~hwy.type) %>%
-  layer_densities()
-
 ##Boxplots for Regions ####
 
 par(mfrow=c(3,3))
@@ -255,6 +249,50 @@ boxplot(aadt ~ travel.pattern, data = norwest,
 
 boxplot(aadt ~ travel.pattern, data = west, 
         main = "AADT for All West", ylab = "AADT", xlab = "Travel Pattern")   
+
+library(ggplot2)
+
+p1 <- ggplot(central$aadt, aes(x=aadt) + geom_histogram(fill="#FF9999", colour="black"))
+
+ggplot(central$aadt, aes(x=aadt) + geom_bar())
+
+d1 <- ggplot(fil.data,aes(x=travel.pattern, y = aadt))+
+  geom_boxplot(aes()) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_boxplot(colour="black", fill="grey") + ggtitle("All Regions") + xlab("AADT") +
+  ylab("Frequency") 
+
+d2 <- ggplot(central,aes(x=travel.pattern, y = aadt))+
+  geom_boxplot(aes()) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_boxplot(colour="black", fill="grey") + ggtitle("Central") + xlab("AADT") +
+  ylab("Frequency") 
+
+d3 <- ggplot(eastern,aes(x=travel.pattern, y = aadt))+
+  geom_boxplot(aes()) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_boxplot(colour="black", fill="grey") + ggtitle("Eastern") + xlab("AADT") +
+  ylab("Frequency") 
+
+d4 <- ggplot(noreast,aes(x=travel.pattern, y = aadt))+
+  geom_boxplot(aes()) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_boxplot(colour="black", fill="grey") + ggtitle("Northeast") + xlab("AADT") +
+  ylab("Frequency") 
+
+d5 <- ggplot(norwest,aes(x=travel.pattern, y = aadt))+
+  geom_boxplot(aes()) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_boxplot(colour="black", fill="grey") + ggtitle("Northwest") + xlab("AADT") +
+  ylab("Frequency") 
+
+d6 <- ggplot(west,aes(x=travel.pattern, y = aadt))+
+  geom_boxplot(aes()) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_boxplot(colour="black", fill="grey") + ggtitle("Western") + xlab("AADT") +
+  ylab("Frequency") 
+
+multiplot(d1, d2, d3, d4, d5, d6, cols=3)
 
 ##Frequency Tables for Region and Travel Pattern ####
 
