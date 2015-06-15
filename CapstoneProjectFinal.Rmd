@@ -1,0 +1,968 @@
+---
+title: "Capstone Project"
+author: "Alex"
+date: "June 13, 2015"
+output: word_document
+---
+
+#Results
+
+```{r Data Cleaning, echo=FALSE, warning=FALSE, message=FALSE, results='hide'}
+library(readr)
+library(dplyr)
+
+# Raw Data Import ####
+
+#lib - readr
+raw <- read_csv("1371_traffic_volumes.csv")
+raw2 <- raw[-1:-2,] #remove extraneous rows (French and blank row) to allow "readr" to reparse variables types correctly
+raw3 <- type_convert(raw2)
+str(raw3) #check datatypes
+
+#Rename columns ####
+#lib - dplyr
+renamed.raw <- rename(raw3, "lhrs" = LHRS,"OS" =`O/S`, "year" = Year, "hwy.num" = `Hwy #`, "hwy.let" = `Hwy Let`, "hwy.type" = `Hwy Type (Text)`, "location" = `Location Description`, "reg" = Reg, "section.len" = `Section Length`, "conn.link.len" = `Connecting Link Length`, "sec.description" = `Secondary Description (for Connecting Links, Regional Boundarys,etc)`, "travel.pattern" = `Travel Pattern`, "dhv.percent" = `DHV %`, "directional.split" = `Directional Split`, "aadt" = AADT, "annual.aadt.change" = `Yearly % Change in AADT`, "decade.change" = `10 Year % Change in AADT`, "sadt" = SADT, "sawdt" = SAWDT, "wadt" = WADT)
+
+#Checking for NAs ####
+length(renamed.raw$lhrs)
+length(renamed.raw$year)
+length(renamed.raw$aadt)
+sum(is.na(renamed.raw$aadt))
+sum(is.na(renamed.raw$sadt))
+sum(is.na(renamed.raw$sawdt))
+sum(is.na(renamed.raw$wadt))
+sum(renamed.raw$year=="9999")
+#there are 553 NA entries for aadt. year is also set to 9999 for these entries
+
+#Removing NAs and duplicate entries ####
+fil.data <- renamed.raw %>%
+  distinct() %>%
+  filter(year!="9999", travel.pattern!="UNC", travel.pattern!="UKN")
+
+length(fil.data$year)
+length(fil.data$aadt)
+length(fil.data$travel.pattern)
+
+glimpse(fil.data)
+
+#convert travel.pattern and region to factor ####
+fil.data$travel.pattern <-  factor(fil.data$travel.pattern)
+fil.data$reg <- factor(fil.data$reg)
+is.factor(fil.data$travel.pattern)
+
+#grouping data by regions: Central, Eastern, Northeastern, Northwestern, West ####
+central <- filter(fil.data, reg == "CR")
+eastern <- filter(fil.data, reg == "ER")
+noreast <- filter(fil.data, reg == "NE")
+norwest <- filter(fil.data, reg == "NW")
+west <- filter(fil.data, reg == "SW")
+
+#select for the four highway types in the dataset
+king <- filter(fil.data, hwy.type == "King")
+secon <- filter(fil.data, hwy.type == "Sec")
+fwy <- filter(fil.data, hwy.type == "Fwy")
+tert <- filter(fil.data, hwy.type == "Tert")
+
+```
+
+##Exploration
+
+```{r}
+library(dplyr)
+library(psych)
+
+explor.stat <- select (fil.data, aadt:wadt)
+describe(explor.stat)
+
+explor.stat1 <- select (central, aadt:wadt)
+explor.stat2 <- select (eastern, aadt:wadt)
+explor.stat3 <- select (noreast, aadt:wadt)
+explor.stat4 <- select (norwest, aadt:wadt)
+explor.stat5 <- select (west, aadt:wadt)
+
+describe(explor.stat1)
+describe(explor.stat2)
+describe(explor.stat3)
+describe(explor.stat4)
+describe(explor.stat5)
+
+```
+
+###Boxplots
+```{r Boxplots of Travel Patterns, echo=FALSE, warning= FALSE, message=FALSE}
+library(ggplot2)
+###Multiplot function ####
+#From R Cookbook: http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot1)/
+
+# Multiple plot function
+#
+# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+# - cols:   Number of columns in layout
+# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
+#
+# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+# then plot 1 will go in the upper left, 2 will go in the upper right, and
+# 3 will go all the way across the bottom.
+#
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+  
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+  
+  numPlots = length(plots)
+  
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+  
+  if (numPlots==1) {
+    print(plots[[1]])
+    
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+d1 <- ggplot(fil.data,aes(x=travel.pattern, y = aadt))+
+  geom_boxplot(aes()) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_boxplot(colour="black", fill="grey") + ggtitle("All Regions") + xlab("AADT") +
+  ylab("Frequency") 
+
+d2 <- ggplot(central,aes(x=travel.pattern, y = aadt))+
+  geom_boxplot(aes()) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_boxplot(colour="black", fill="grey") + ggtitle("Central") + xlab("AADT") +
+  ylab("Frequency") 
+
+d3 <- ggplot(eastern,aes(x=travel.pattern, y = aadt))+
+  geom_boxplot(aes()) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_boxplot(colour="black", fill="grey") + ggtitle("Eastern") + xlab("AADT") +
+  ylab("Frequency") 
+
+d4 <- ggplot(noreast,aes(x=travel.pattern, y = aadt))+
+  geom_boxplot(aes()) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_boxplot(colour="black", fill="grey") + ggtitle("Northeast") + xlab("AADT") +
+  ylab("Frequency") 
+
+d5 <- ggplot(norwest,aes(x=travel.pattern, y = aadt))+
+  geom_boxplot(aes()) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_boxplot(colour="black", fill="grey") + ggtitle("Northwest") + xlab("AADT") +
+  ylab("Frequency") 
+
+d6 <- ggplot(west,aes(x=travel.pattern, y = aadt))+
+  geom_boxplot(aes()) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_boxplot(colour="black", fill="grey") + ggtitle("Western") + xlab("AADT") +
+  ylab("Frequency") 
+
+multiplot(d1, d2, d3, d4, d5, d6, cols=2)
+```
+
+
+###Histograms
+```{r Histogram of Regions, echo=FALSE, warning= FALSE, message=FALSE}
+
+# Histograms ####
+
+#describe distribution of patterns by region
+
+library(ggplot2)
+
+d1 <- ggplot(fil.data,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("All Regions") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+  color="red", linetype="dashed", size=1)
+
+d2 <- ggplot(central,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("Central") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+  color="red", linetype="dashed", size=1)
+
+d3 <- ggplot(eastern,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("Eastern") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+  color="red", linetype="dashed", size=1)
+
+d4 <- ggplot(noreast,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("Northeast") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+  color="red", linetype="dashed", size=1)
+
+d5 <- ggplot(norwest,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("Northwest") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+  color="red", linetype="dashed", size=1)
+ 
+d6 <- ggplot(west,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("West") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+  color="red", linetype="dashed", size=1)
+
+multiplot(d1, d2, d3, d4, d5, d6, cols=3)
+```
+
+```{r Histogram of Travel Pattern, echo=FALSE, warning= FALSE, message=FALSE}
+##Distribution of Travel by Pattern ####
+c1 <- ggplot(fwy,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("Freeways") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+             color="red", linetype="dashed", size=1)
+
+c2 <- ggplot(king,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("King's") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+             color="red", linetype="dashed", size=1)
+
+c3 <- ggplot(secon,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("Secondary") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+             color="red", linetype="dashed", size=1)
+
+c4 <- ggplot(tert,aes(x=aadt))+
+  geom_histogram(aes(y= ..density..)) + 
+  theme(panel.background = element_rect(fill = 'white', colour = 'black')) + 
+  geom_histogram(colour="black", fill="grey") + ggtitle("Tertiary") + xlab("AADT") +
+  ylab("Frequency") + 
+  geom_vline(aes(xintercept=mean(aadt, na.rm=T)),  
+             color="red", linetype="dashed", size=1)
+
+multiplot(c1, c2, c3, c4, cols=2)
+```
+
+
+```{r Mosiac Plot, echo=FALSE, warning= FALSE, message=FALSE}
+##Mosaic Plots ####
+
+library(dplyr)  
+library(vcd)
+mytable <- table(fil.data$reg,fil.data$travel.pattern) 
+
+mosaicplot(mytable, main="Region vs. Travel Pattern",
+           xlab="Travel Pattern",ylab="Region",
+           col=c(3:16), legend=TRUE)
+
+#Talk about differences between sqkm landmass and population of north and south ontario
+```
+  
+``` {r Correspondence Analysis, echo=FALSE, warning= FALSE, message=FALSE}  
+##Correspondence Analysis for All Regions ####
+  
+library(ca)
+mytable <- table(fil.data$reg,fil.data$travel.pattern)
+#prop.table(mytable, 1) # row percentages
+#prop.table(mytable, 2) # column percentages
+fit <- ca(mytable)
+#print(fit) # basic results 
+#summary(fit) # extended results 
+plot(fit) # symmetric map
+plot(fit, mass = TRUE, contrib = "absolute", map =
+       "rowgreen", arrows = c(FALSE, TRUE)) # asymmetric map  
+  
+```
+
+
+##Predictions
+
+###Linear Regression for All Regions
+```{r Linear Modelling All Regions, echo=FALSE, warning= FALSE, message=FALSE}
+
+old.par <- par()
+
+par(mfrow=c(2,2))
+
+##Fit for All Regions
+
+###Strength of Association  
+
+lmfit0 <- lm (aadt ~ travel.pattern, data=fil.data)
+
+rsq0 <- summary(lmfit0)$r.squared
+rsq0
+sqrt(rsq0)
+
+cor(fil.data$aadt, lmfit0$fitted)
+
+summary(lmfit0)
+anova(lmfit0)
+plot(lmfit0)
+
+par(old.par)
+
+plot(x = lmfit0$fitted, y = fil.data$aadt,
+     xlab = "Fitted AADT", ylab = "Observed AADT")
+abline(lm(fil.data$aadt ~ lmfit0$fitted,), col="red")
+
+#Model Building with AADT and Traffic Pattern
+
+library(MASS) 
+library(leaps) 
+library(glmnet)   
+
+model_ulm <- lm (aadt ~ travel.pattern, data=fil.data)
+summary(model_ulm)  
+  
+#Dividing Data into testing and training sets
+
+rn_train <- sample(nrow(fil.data), 
+                   floor(nrow(fil.data)*0.7))
+train <- fil.data[rn_train,]
+test <- fil.data[-rn_train,]
+
+prediction <- predict(model_ulm, interval="prediction", 
+                      newdata =test)
+Errors <- prediction[,"fit"] - test$aadt
+hist(Errors)
+rmse <- sqrt(sum((prediction[,"fit"] - test$aadt)^2)/nrow(test))
+rel_change <- 1 - ((test$aadt- abs(Errors)) / test$aadt)
+pred25 <- table(rel_change<0.25)["TRUE"] / nrow(test)
+paste("RMSE:", rmse)
+paste("PRED(25):", pred25)
+
+#Stepwise Regression
+
+#Forward stepwise regression:
+
+library(MASS) 
+library(leaps) 
+full <- lm(aadt~travel.pattern, data=fil.data) 
+null <- lm(aadt~1,data=fil.data)
+stepF <- stepAIC(null, scope=list(lower=null, upper=full), 
+                 direction= "forward", trace=TRUE)
+summary(stepF)
+
+#Backward stepwise regression:
+
+full <- lm(aadt~travel.pattern, data=fil.data) 
+stepB <- stepAIC(full, direction= "backward", trace=TRUE)
+summary(stepB)
+
+
+#10 Fold Cross Validation
+library(caret)
+
+folds <- createFolds(fil.data$aadt, k=10)
+
+for (f in folds){
+  train <- fil.data[-f,] 
+  test <- fil.data[f,]
+}
+
+model_mlr <- lm(aadt ~ travel.pattern, data=train) 
+
+prediction <- predict(model_mlr, interval="prediction", 
+                      newdata =test)
+Errors <- prediction[,"fit"] - test$aadt
+hist(Errors)
+rmse <- sqrt(sum((prediction[,"fit"] - test$aadt)^2)/nrow(test))
+rel_change <- 1 - ((test$aadt- abs(Errors)) / test$aadt)
+pred25 <- table(rel_change<0.25)["TRUE"] / nrow(test)
+paste("RMSE:", rmse)
+paste("PRED(25):", pred25)
+
+#Best Combination of Travel Patterns for All Regions
+
+library(leaps)
+subsets<-regsubsets(aadt~travel.pattern,data=fil.data,
+                    nbest=1,)
+sub.sum <- summary(subsets)
+as.data.frame(sub.sum$outmat)
+```
+
+###Linear Regression for Central
+```{r Linear Modelling Central, echo=FALSE, warning= FALSE, message=FALSE}
+
+par(mfrow=c(2,2))
+
+##Fit for Central
+
+###Strength of Association  
+
+lmfit1 <- lm (aadt ~ travel.pattern, data=central)
+
+rsq0 <- summary(lmfit1)$r.squared
+rsq0
+sqrt(rsq0)
+
+cor(central$aadt, lmfit1$fitted)
+
+summary(lmfit1)
+plot(lmfit1)
+anova(lmfit1)
+
+#print(lmfit1$fitted)
+
+par(old.par)
+
+plot(x = lmfit1$fitted, y = central$aadt,
+     xlab = "Fitted AADT", ylab = "Observed AADT")
+abline(lm(central$aadt ~ lmfit1$fitted,), col="red")
+
+
+#Model Building with AADT and Traffic Pattern
+
+library(MASS) 
+library(leaps) 
+library(glmnet)   
+
+model_ulm <- lm (aadt ~ travel.pattern, data=central)
+summary(model_ulm)  
+
+#Dividing Data into testing and training sets
+
+rn_train <- sample(nrow(central), 
+                   floor(nrow(central)*0.7))
+train <- central[rn_train,]
+test <- central[-rn_train,]
+
+prediction <- predict(model_ulm, interval="prediction", 
+                      newdata =test)
+Errors <- prediction[,"fit"] - test$aadt
+hist(Errors)
+rmse <- sqrt(sum((prediction[,"fit"] - test$aadt)^2)/nrow(test))
+rel_change <- 1 - ((test$aadt- abs(Errors)) / test$aadt)
+pred25 <- table(rel_change<0.25)["TRUE"] / nrow(test)
+paste("RMSE:", rmse)
+paste("PRED(25):", pred25)
+
+#Stepwise Regression
+
+#Forward stepwise regression:
+
+numeric.travel <- central
+numeric.travel$travel.pattern <- as.numeric(numeric.travel$travel.pattern)
+
+library(MASS) 
+library(leaps) 
+full <- lm(aadt~travel.pattern, data=central) 
+null <- lm(aadt~1,data=central)
+stepF <- stepAIC(null, scope=list(lower=null, upper=full), 
+                 direction= "forward", trace=TRUE)
+summary(stepF)
+
+#Backward stepwise regression:
+
+full <- lm(aadt~travel.pattern, data=central) 
+stepB <- stepAIC(full, direction= "backward", trace=TRUE)
+summary(stepB)
+
+
+#10 Fold Cross Validation
+library(caret)
+
+folds <- createFolds(central$aadt, k=10)
+
+for (f in folds){
+  train <- central[-f,] 
+  test <- central[f,]
+}
+
+model_mlr <- lm(aadt ~ travel.pattern, data=train) 
+
+prediction <- predict(model_mlr, interval="prediction", 
+                      newdata =test)
+Errors <- prediction[,"fit"] - test$aadt
+hist(Errors)
+rmse <- sqrt(sum((prediction[,"fit"] - test$aadt)^2)/nrow(test))
+rel_change <- 1 - ((test$aadt- abs(Errors)) / test$aadt)
+pred25 <- table(rel_change<0.25)["TRUE"] / nrow(test)
+paste("RMSE:", rmse)
+paste("PRED(25):", pred25)
+
+#Best Combination of Travel Patterns for Central Region
+
+library(leaps)
+subsets<-regsubsets(aadt~travel.pattern,data=central,
+                    nbest=1,)
+sub.sum <- summary(subsets)
+as.data.frame(sub.sum$outmat)
+```
+
+###Linear Regression for Eastern
+```{r Linear Modelling Eastern, echo=FALSE, warning= FALSE, message=FALSE}
+#Linear Models for Eastern Region ####
+
+par(mfrow=c(2,2))
+
+##Fit for eastern
+
+###Strength of Association  
+
+lmfit2 <- lm (aadt ~ travel.pattern, data=eastern)
+
+rsq0 <- summary(lmfit2)$r.squared
+rsq0
+sqrt(rsq0)
+
+cor(eastern$aadt, lmfit2$fitted)
+
+summary(lmfit2)
+plot(lmfit2)
+anova(lmfit2)
+
+#print(lmfit2$fitted)
+
+par(old.par)
+
+plot(x = lmfit2$fitted, y = eastern$aadt,
+     xlab = "Fitted AADT", ylab = "Observed AADT")
+abline(lm(eastern$aadt ~ lmfit2$fitted,), col="red")
+
+#Model Building with AADT and Traffic Pattern
+
+library(MASS) 
+library(leaps) 
+library(glmnet)   
+
+model_ulm <- lm (aadt ~ travel.pattern, data=eastern)
+summary(model_ulm)  
+
+#Dividing Data into testing and training sets
+
+rn_train <- sample(nrow(eastern), 
+                   floor(nrow(eastern)*0.7))
+train <- eastern[rn_train,]
+test <- eastern[-rn_train,]
+
+prediction <- predict(model_ulm, interval="prediction", 
+                      newdata =test)
+Errors <- prediction[,"fit"] - test$aadt
+hist(Errors)
+rmse <- sqrt(sum((prediction[,"fit"] - test$aadt)^2)/nrow(test))
+rel_change <- 1 - ((test$aadt- abs(Errors)) / test$aadt)
+pred25 <- table(rel_change<0.25)["TRUE"] / nrow(test)
+paste("RMSE:", rmse)
+paste("PRED(25):", pred25)
+
+#Stepwise Regression
+
+#Forward stepwise regression:
+
+numeric.travel <- eastern
+numeric.travel$travel.pattern <- as.numeric(numeric.travel$travel.pattern)
+
+library(MASS) 
+library(leaps) 
+full <- lm(aadt~travel.pattern, data=eastern) 
+null <- lm(aadt~1,data=eastern)
+stepF <- stepAIC(null, scope=list(lower=null, upper=full), 
+                 direction= "forward", trace=TRUE)
+summary(stepF)
+
+#Backward stepwise regression:
+
+full <- lm(aadt~travel.pattern, data=eastern) 
+stepB <- stepAIC(full, direction= "backward", trace=TRUE)
+summary(stepB)
+
+
+#10 Fold Cross Validation
+library(caret)
+
+folds <- createFolds(eastern$aadt, k=10)
+
+for (f in folds){
+  train <- eastern[-f,] 
+  test <- eastern[f,]
+}
+
+model_mlr <- lm(aadt ~ travel.pattern, data=train) 
+
+prediction <- predict(model_mlr, interval="prediction", 
+                      newdata =test)
+Errors <- prediction[,"fit"] - test$aadt
+hist(Errors)
+rmse <- sqrt(sum((prediction[,"fit"] - test$aadt)^2)/nrow(test))
+rel_change <- 1 - ((test$aadt- abs(Errors)) / test$aadt)
+pred25 <- table(rel_change<0.25)["TRUE"] / nrow(test)
+paste("RMSE:", rmse)
+paste("PRED(25):", pred25)
+
+#Best Combination of Travel Patterns for eastern Region
+
+library(leaps)
+subsets<-regsubsets(aadt~travel.pattern,data=eastern,
+                    nbest=1,)
+sub.sum <- summary(subsets)
+as.data.frame(sub.sum$outmat)
+
+```
+
+###Linear Regression for North Eastern
+```{r Linear Modelling Northeastern, echo=FALSE, warning= FALSE, message=FALSE}
+#Linear Models for Northeast Region ####
+
+par(mfrow=c(2,2))
+
+##Fit for noreast
+
+###Strength of Association  
+
+lmfit3 <- lm (aadt ~ travel.pattern, data=noreast)
+
+rsq0 <- summary(lmfit3)$r.squared
+rsq0
+sqrt(rsq0)
+
+cor(noreast$aadt, lmfit3$fitted)
+
+summary(lmfit3)
+plot(lmfit3)
+anova(lmfit3)
+
+#print(lmfit3$fitted)
+
+par(old.par)
+
+plot(x = lmfit3$fitted, y = noreast$aadt,
+     xlab = "Fitted AADT", ylab = "Observed AADT")
+abline(lm(noreast$aadt ~ lmfit3$fitted,), col="red")
+
+#Model Building with AADT and Traffic Pattern
+
+library(MASS) 
+library(leaps) 
+library(glmnet)   
+
+model_ulm <- lm (aadt ~ travel.pattern, data=noreast)
+summary(model_ulm)  
+
+#Dividing Data into testing and training sets
+
+rn_train <- sample(nrow(noreast), 
+                   floor(nrow(noreast)*0.7))
+train <- noreast[rn_train,]
+test <- noreast[-rn_train,]
+
+prediction <- predict(model_ulm, interval="prediction", 
+                      newdata =test)
+Errors <- prediction[,"fit"] - test$aadt
+hist(Errors)
+rmse <- sqrt(sum((prediction[,"fit"] - test$aadt)^2)/nrow(test))
+rel_change <- 1 - ((test$aadt- abs(Errors)) / test$aadt)
+pred25 <- table(rel_change<0.25)["TRUE"] / nrow(test)
+paste("RMSE:", rmse)
+paste("PRED(25):", pred25)
+
+#Stepwise Regression
+
+#Forward stepwise regression:
+
+numeric.travel <- noreast
+numeric.travel$travel.pattern <- as.numeric(numeric.travel$travel.pattern)
+
+library(MASS) 
+library(leaps) 
+full <- lm(aadt~travel.pattern, data=noreast) 
+null <- lm(aadt~1,data=noreast)
+stepF <- stepAIC(null, scope=list(lower=null, upper=full), 
+                 direction= "forward", trace=TRUE)
+summary(stepF)
+
+#Backward stepwise regression:
+
+full <- lm(aadt~travel.pattern, data=noreast) 
+stepB <- stepAIC(full, direction= "backward", trace=TRUE)
+summary(stepB)
+
+
+#10 Fold Cross Validation
+library(caret)
+
+folds <- createFolds(noreast$aadt, k=10)
+
+for (f in folds){
+  train <- noreast[-f,] 
+  test <- noreast[f,]
+}
+
+model_mlr <- lm(aadt ~ travel.pattern, data=train) 
+
+prediction <- predict(model_mlr, interval="prediction", 
+                      newdata =test)
+Errors <- prediction[,"fit"] - test$aadt
+hist(Errors)
+rmse <- sqrt(sum((prediction[,"fit"] - test$aadt)^2)/nrow(test))
+rel_change <- 1 - ((test$aadt- abs(Errors)) / test$aadt)
+pred25 <- table(rel_change<0.25)["TRUE"] / nrow(test)
+paste("RMSE:", rmse)
+paste("PRED(25):", pred25)
+
+#Best Combination of Travel Patterns for noreast Region
+
+library(leaps)
+subsets<-regsubsets(aadt~travel.pattern,data=noreast,
+                    nbest=1,)
+sub.sum <- summary(subsets)
+as.data.frame(sub.sum$outmat)
+
+```
+
+###Linear Regression for North Western
+```{r Linear Modelling Northwestern, echo=FALSE, warning= FALSE, message=FALSE}
+#Linear Models for Northwest Region ####
+
+par(mfrow=c(2,2))
+
+##Fit for norwest
+
+###Strength of Association  
+
+lmfit4 <- lm (aadt ~ travel.pattern, data=norwest)
+
+rsq0 <- summary(lmfit4)$r.squared
+rsq0
+sqrt(rsq0)
+
+cor(norwest$aadt, lmfit4$fitted)
+
+summary(lmfit4)
+plot(lmfit4)
+anova(lmfit4)
+
+
+#print(lmfit4$fitted)
+
+par(old.par)
+
+plot(x = lmfit4$fitted, y = norwest$aadt,
+     xlab = "Fitted AADT", ylab = "Observed AADT")
+abline(lm(norwest$aadt ~ lmfit4$fitted,), col="red")
+
+#Model Building with AADT and Traffic Pattern
+
+library(MASS) 
+library(leaps) 
+library(glmnet)   
+
+model_ulm <- lm (aadt ~ travel.pattern, data=norwest)
+summary(model_ulm)  
+
+#Dividing Data into testing and training sets
+
+rn_train <- sample(nrow(norwest), 
+                   floor(nrow(norwest)*0.7))
+train <- norwest[rn_train,]
+test <- norwest[-rn_train,]
+
+prediction <- predict(model_ulm, interval="prediction", 
+                      newdata =test)
+Errors <- prediction[,"fit"] - test$aadt
+hist(Errors)
+rmse <- sqrt(sum((prediction[,"fit"] - test$aadt)^2)/nrow(test))
+rel_change <- 1 - ((test$aadt- abs(Errors)) / test$aadt)
+pred25 <- table(rel_change<0.25)["TRUE"] / nrow(test)
+paste("RMSE:", rmse)
+paste("PRED(25):", pred25)
+
+#Stepwise Regression
+
+#Forward stepwise regression:
+
+numeric.travel <- norwest
+numeric.travel$travel.pattern <- as.numeric(numeric.travel$travel.pattern)
+
+library(MASS) 
+library(leaps) 
+full <- lm(aadt~travel.pattern, data=norwest) 
+null <- lm(aadt~1,data=norwest)
+stepF <- stepAIC(null, scope=list(lower=null, upper=full), 
+                 direction= "forward", trace=TRUE)
+summary(stepF)
+
+#Backward stepwise regression:
+
+full <- lm(aadt~travel.pattern, data=norwest) 
+stepB <- stepAIC(full, direction= "backward", trace=TRUE)
+summary(stepB)
+
+
+#10 Fold Cross Validation
+library(caret)
+
+folds <- createFolds(norwest$aadt, k=10)
+
+for (f in folds){
+  train <- norwest[-f,] 
+  test <- norwest[f,]
+}
+
+model_mlr <- lm(aadt ~ travel.pattern, data=train) 
+
+prediction <- predict(model_mlr, interval="prediction", 
+                      newdata =test)
+Errors <- prediction[,"fit"] - test$aadt
+hist(Errors)
+rmse <- sqrt(sum((prediction[,"fit"] - test$aadt)^2)/nrow(test))
+rel_change <- 1 - ((test$aadt- abs(Errors)) / test$aadt)
+pred25 <- table(rel_change<0.25)["TRUE"] / nrow(test)
+paste("RMSE:", rmse)
+paste("PRED(25):", pred25)
+
+#Best Combination of Travel Patterns for norwest Region
+
+library(leaps)
+subsets<-regsubsets(aadt~travel.pattern,data=norwest,
+                    nbest=1,)
+sub.sum <- summary(subsets)
+as.data.frame(sub.sum$outmat)
+
+```
+
+###Linear Regression for Western
+```{r Linear Modelling Western, echo=FALSE, warning= FALSE, message=FALSE}
+#Linear Models for West Region ####
+
+par(mfrow=c(2,2))
+
+##Fit for west
+
+###Strength of Association  
+
+lmfit5 <- lm (aadt ~ travel.pattern, data=west)
+
+rsq0 <- summary(lmfit5)$r.squared
+rsq0
+sqrt(rsq0)
+
+cor(west$aadt, lmfit5$fitted)
+
+summary(lmfit5)
+plot(lmfit5)
+anova(lmfit5)
+
+#print(lmfit5$fitted)
+
+par(old.par)
+
+plot(x = lmfit5$fitted, y = west$aadt,
+     xlab = "Fitted AADT", ylab = "Observed AADT")
+abline(lm(west$aadt ~ lmfit5$fitted,), col="red")
+
+#Model Building with AADT and Traffic Pattern
+
+library(MASS) 
+library(leaps) 
+library(glmnet)   
+
+model_ulm <- lm (aadt ~ travel.pattern, data=west)
+summary(model_ulm)  
+
+#Dividing Data into testing and training sets
+
+rn_train <- sample(nrow(west), 
+                   floor(nrow(west)*0.7))
+train <- west[rn_train,]
+test <- west[-rn_train,]
+
+prediction <- predict(model_ulm, interval="prediction", 
+                      newdata =test)
+Errors <- prediction[,"fit"] - test$aadt
+hist(Errors)
+rmse <- sqrt(sum((prediction[,"fit"] - test$aadt)^2)/nrow(test))
+rel_change <- 1 - ((test$aadt- abs(Errors)) / test$aadt)
+pred25 <- table(rel_change<0.25)["TRUE"] / nrow(test)
+paste("RMSE:", rmse)
+paste("PRED(25):", pred25)
+
+#Stepwise Regression
+
+#Forward stepwise regression:
+
+numeric.travel <- west
+numeric.travel$travel.pattern <- as.numeric(numeric.travel$travel.pattern)
+
+library(MASS) 
+library(leaps) 
+full <- lm(aadt~travel.pattern, data=west) 
+null <- lm(aadt~1,data=west)
+stepF <- stepAIC(null, scope=list(lower=null, upper=full), 
+                 direction= "forward", trace=TRUE)
+summary(stepF)
+
+#Backward stepwise regression:
+
+full <- lm(aadt~travel.pattern, data=west) 
+stepB <- stepAIC(full, direction= "backward", trace=TRUE)
+summary(stepB)
+
+
+#10 Fold Cross Validation
+library(caret)
+
+folds <- createFolds(west$aadt, k=10)
+
+for (f in folds){
+  train <- west[-f,] 
+  test <- west[f,]
+}
+
+model_mlr <- lm(aadt ~ travel.pattern, data=train) 
+
+prediction <- predict(model_mlr, interval="prediction", 
+                      newdata =test)
+Errors <- prediction[,"fit"] - test$aadt
+hist(Errors)
+rmse <- sqrt(sum((prediction[,"fit"] - test$aadt)^2)/nrow(test))
+rel_change <- 1 - ((test$aadt- abs(Errors)) / test$aadt)
+pred25 <- table(rel_change<0.25)["TRUE"] / nrow(test)
+paste("RMSE:", rmse)
+paste("PRED(25):", pred25)
+
+#Best Combination of Travel Patterns for west Region
+
+library(leaps)
+subsets<-regsubsets(aadt~travel.pattern,data=west,
+                    nbest=1,)
+sub.sum <- summary(subsets)
+as.data.frame(sub.sum$outmat)
+
+
+```
